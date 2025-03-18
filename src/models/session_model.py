@@ -9,7 +9,7 @@ class Session(Document):
   """
   session_token: Annotated[str, Indexed(unique=True)]
   user_id: str
-  created_at: Annotated[datetime.datetime, Indexed(expire_after_seconds=60*60*24)]
+  created_at: Annotated[datetime.datetime, Indexed(expireAfterSeconds=60*60*24)]
 
   @classmethod
   def __init__(self, session_token, user_id):
