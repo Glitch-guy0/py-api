@@ -12,7 +12,5 @@ class Session(Document):
   created_at: Annotated[datetime.datetime, Indexed(expireAfterSeconds=60*60*24)]
 
   @classmethod
-  def __init__(self, session_token, user_id):
-    self.session_token = session_token
-    self.user_id = user_id
-    self.created_at = datetime.datetime.now()
+  def create(self, session_token, user_id):
+    return self(session_token=session_token, user_id=user_id, created_at=datetime.datetime.now())

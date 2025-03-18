@@ -25,7 +25,7 @@ async def db_init():
         sys.exit(1)
     else:
         # db connection here
-        print('connected to db/ running')
+        print('connected to db')
 
 if __name__ == "__main__":
     asyncio.run(db_init())

@@ -1,10 +1,10 @@
 
 import datetime
+from typing import Annotated
 from beanie import Document, Indexed
 import re
 from pydantic import EmailStr
 from fastapi import HTTPException
-from typing import Annotated
 
 
 class User(Document):
@@ -12,16 +12,14 @@ class User(Document):
     Collection name: users
   """
   username: str
-  email: EmailStr
+  email: Annotated[EmailStr, Indexed(unique=True)]
   password: str
   salt: int
 
   @classmethod
-  def __init__(self, username, email, password):
-    self.username = username
-    self.email = email
+  def create(self, username, email, password):
     auth.password_validator(password)
-    self.password = password
+    return self(username=username, email=email, password=password, salt=34)
 
 
 class auth:
