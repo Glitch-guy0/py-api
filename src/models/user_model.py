@@ -31,7 +31,7 @@ class auth:
       Raises:
         HTTPException: if password didn't meet the criteria
     """
-    password_regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#&])[A-Za-z\d@$#&]{8,20}$"
+    password_regex = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#&])[A-Za-z\d@$#&]{8,20}$"
     regex = re.compile(password_regex)
     valid = re.search(regex, password)
     if valid:
