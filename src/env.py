@@ -2,6 +2,6 @@
 
 
 DB_NAME='py-api'
-DB_USER='root'
-DB_PASS='root'
-DB_HOST='localhost:8000'
+DB_USER='admin'
+DB_PASS='admin'
+DB_HOST='localhost:27017'
