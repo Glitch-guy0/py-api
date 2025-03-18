@@ -8,11 +8,10 @@ from models.user_model import User
 from pymongo.errors import ServerSelectionTimeoutError
 
 async def db_connect():
-    # client = AsyncIOMotorClient(f"mongodb://{env.DB_USER}:{env.DB_PASS}@{env.DB_HOST}/{env.DB_NAME}", connectTimeoutMS=3000, ServerSelectionTimeoutMS=3000)
-    client = AsyncIOMotorClient(host="localhost",port=27017,username="admin", password="admin",connectTimeoutMS=3000, ServerSelectionTimeoutMS=3000)
+    client = AsyncIOMotorClient(host=env.DB_HOST,port=env.DB_PORT,username=env.DB_USER, password=env.DB_PASS,connectTimeoutMS=3000, ServerSelectionTimeoutMS=3000)
 
     # Initialize beanie with the Product document class
-    db_connection = await init_beanie(database=client.db_name, document_models=[User, Session])
+    db_connection = await init_beanie(database=client[env.DB_NAME], document_models=[User, Session])
 
 
 async def db_init():
