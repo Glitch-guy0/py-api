@@ -39,6 +39,37 @@ class User(Document):
     return password.encode('utf-8')
 
 
+  @staticmethod
+  async def get_user_by_id(user_id: ObjectId):
+    """
+      returns user details using user_id?
+    """
+    user = await User.find_one({"_id": user_id})
+    
+    if not user:
+      raise HTTPException(404, "user not found!!")
+    
+    return user
+
+  @staticmethod
+  async def get_user_login_details(user_email: EmailStr):
+    """
+      returns dict(id, password) if exists
+      Raises:
+        HTTPException: user not found
+        # HTTPException: Email format is not correct
+    """
+    user = await User.find_one({"email": user_email})
+    if(not user):
+      raise HTTPException(404, "User not Found")
+    
+    login_data = dict()
+    login_data["id"] = user.id
+    login_data["password"] = user.password
+    return login_data
+
+
+
 class Auth:
   @staticmethod
   def password_validator(password: str) -> bool:
