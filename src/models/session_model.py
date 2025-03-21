@@ -28,3 +28,8 @@ class Session(Document):
       raise HTTPException(401, "Session Expired, Please Login")
     
     return session_data.user_id
+  
+
+  @staticmethod
+  async def delete_session(session_token: str)-> None:
+    await Session.find_one({"session_token": session_token}).delete()
