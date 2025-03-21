@@ -14,9 +14,17 @@ class Session(Document):
   created_at: Annotated[datetime.datetime, Indexed(expireAfterSeconds=60*60*24)]
 
   @classmethod
-  async def create(cls, session_token: str, user_id: PydanticObjectId):
+  async def create_session(cls, session_token: str, user_id: PydanticObjectId)-> None:
     new_session = cls(session_token=session_token, user_id=user_id, created_at=datetime.datetime.now())
     try:
       await new_session.save()
     except Exception as e:
       raise HTTPException(409, "Session alrady Exists")
+    
+  @staticmethod
+  async def get_session_userid(session_token: str)-> PydanticObjectId:
+    session_data:Session|None = await Session.find_one({"session_token": session_token})
+    if not session_data:
+      raise HTTPException(401, "Session Expired, Please Login")
+    
+    return session_data.user_id
