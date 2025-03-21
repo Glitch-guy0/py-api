@@ -8,6 +8,8 @@ from fastapi import HTTPException
 import env
 import bcrypt
 import random
+from bson import ObjectId
+from pymongo.errors import DuplicateKeyError
 
 class User(Document):
   """
@@ -18,18 +20,27 @@ class User(Document):
   password: bytes # bcrypt returns byte data
   # bcrypt stores salt and other metadata internally
 
-  @classmethod
-  def create(self, username:str, email:EmailStr, password:str):
-    auth.password_validator(password)
-    salt: bytes = bcrypt.gensalt(random.randint(12,15))
-    hashed_password: bytes = bcrypt.hashpw(User.__encode_password(password),salt)
-    return self(username=username, email=email, password=hashed_password)
 
+  # note: class mehtod is class *not instance* similar to static methods
+  @classmethod
+  async def create(cls, username:str, email:EmailStr, password:str):
+    try:
+      Auth.password_validator(password)
+      salt: bytes = bcrypt.gensalt(random.randint(12,15))
+      hashed_password: bytes = bcrypt.hashpw(User.__encode_password(password),salt)
+      new_user:User = cls(username=username, email=email, password=hashed_password)
+      await new_user.save()
+    
+    except DuplicateKeyError:
+      raise HTTPException(409, "User already Exist!")
+    
   @staticmethod
   def __encode_password(password:str)->bytes:
     return password.encode('utf-8')
 
-class auth:
+
+class Auth:
+  @staticmethod
   def password_validator(password: str) -> bool:
     """
       just a function call to validate password, in case of error it will automatically send response back.
