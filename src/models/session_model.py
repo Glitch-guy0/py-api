@@ -2,6 +2,8 @@
 import datetime
 from typing import Annotated
 from beanie import Document, Indexed, PydanticObjectId
+from fastapi import HTTPException
+
 
 class Session(Document):
   """
@@ -14,4 +16,7 @@ class Session(Document):
   @classmethod
   async def create(cls, session_token: str, user_id: PydanticObjectId):
     new_session = cls(session_token=session_token, user_id=user_id, created_at=datetime.datetime.now())
-    await new_session.save()
+    try:
+      await new_session.save()
+    except Exception as e:
+      raise HTTPException(409, "Session alrady Exists")
