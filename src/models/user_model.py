@@ -82,7 +82,13 @@ class User(Document):
     
     if not response.raw_result.get('updatedExisting'):
       raise HTTPException(404, "User does not exist")
-  
+    
+  @staticmethod
+  async def delete_user(user_id: PydanticObjectId)->None:
+    response = await User.find_one({"_id": user_id}).delete()
+    if not response:
+      raise HTTPException(404, "User Not Found")
+
 class Auth:
   @staticmethod
   def password_validator(password: str) -> bool:
