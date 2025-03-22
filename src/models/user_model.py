@@ -1,15 +1,22 @@
 
-
-from typing import Annotated
-from beanie import Document, Indexed
+from __future__ import annotations
+from typing import Annotated, Optional
+from beanie import Document, Indexed, PydanticObjectId
 import re
-from pydantic import EmailStr, Field
+from pydantic import EmailStr, Field, BaseModel
 from fastapi import HTTPException
+from pymongo import UpdateMany
 import env
 import bcrypt
 import random
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
+
+class Update_User(BaseModel):
+  username: Optional[str] = Field(min_length=3, max_length=20)
+  email: Optional[EmailStr] = None
+  password: Optional[bytes] = None # bcrypt returns byte data
+
 
 class User(Document):
   """
@@ -68,8 +75,14 @@ class User(Document):
     login_data["password"] = user.password
     return login_data
 
-
-
+  @staticmethod
+  async def update_user(userid: PydanticObjectId, user_data: Update_User )-> None:
+    modified_data_fields = user_data.model_dump(exclude_none=True)
+    response :UpdateMany = await User.find_one({"_id": userid}).update({"$set": modified_data_fields})
+    
+    if not response.raw_result.get('updatedExisting'):
+      raise HTTPException(404, "User does not exist")
+  
 class Auth:
   @staticmethod
   def password_validator(password: str) -> bool:
