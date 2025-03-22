@@ -11,6 +11,7 @@ import bcrypt
 import random
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
+from auth_model import Auth
 
 class Update_User(BaseModel):
   username: Optional[str] = Field(min_length=3, max_length=20)
@@ -88,23 +89,3 @@ class User(Document):
     response = await User.find_one({"_id": user_id}).delete()
     if not response:
       raise HTTPException(404, "User Not Found")
-
-class Auth:
-  @staticmethod
-  def password_validator(password: str) -> bool:
-    """
-      just a function call to validate password, in case of error it will automatically send response back.
-      Raises:
-        HTTPException: if password didn't meet the criteria
-    """
-    password_regex = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#&])[A-Za-z\d@$#&]{8,20}$"
-    regex = re.compile(password_regex)
-    valid = re.search(regex, password)
-    if valid:
-      return True
-    else:
-      raise HTTPException(
-          status_code=422, # Unprocessable Entity 
-          detail="Password does not meet validation criteria. Must be 8-20 characters long, contain uppercase, lowercase, digit, special characters (@$#&)"
-        )
-    
