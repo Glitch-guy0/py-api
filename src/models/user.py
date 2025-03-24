@@ -29,10 +29,10 @@ class User(BaseModel):
       hashed_password = Crypto.hash_password(user.password)
       new_user = User_Schema(username=user.username, email=user.email, password=hashed_password)
       await new_user.insert()
-
+    except HTTPException as e:
+      raise HTTPException(e.status_code, e.detail)
     except Exception as e:
-      print("user insertion error: ", e)
-      raise HTTPException(500, "server error")
+      print(e)
 
   @staticmethod
   async def get_user_by_email(email: EmailStr)->Login_Info :
