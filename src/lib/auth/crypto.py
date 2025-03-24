@@ -1,7 +1,7 @@
 # this is where bcrypt and jwt goes
 import bcrypt
 import random
-from validations import Validations
+from .validations import Validations
 
 class Crypto:
   @staticmethod
