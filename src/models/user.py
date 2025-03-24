@@ -1,14 +1,15 @@
 # contains user database related functions
 from beanie import Document, Indexed, PydanticObjectId
+from pydantic import BaseModel
 from pydantic import Field, EmailStr
 from typing import Annotated, Optional
 from fastapi import HTTPException
 
-class Update_User(Document):
+class Update_User(BaseModel):
   username: Optional[str] = Field(None, min_length=3, max_length=20)
   password: Optional[str] = None
 
-class Login_Info(Document):
+class Login_Info(BaseModel):
   id: PydanticObjectId
   password: bytes
 
@@ -17,9 +18,9 @@ class User_Schema(Document):
   email: Annotated[EmailStr, Indexed(unique=True)]
   password: bytes
 
-class User(Document):
+class User(BaseModel):
   username: str = Field(min_length=3, max_length=20)
-  email: Annotated[EmailStr, Indexed(unique=True)]
+  email: EmailStr
   password: str
 
   @staticmethod
