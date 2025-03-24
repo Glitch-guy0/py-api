@@ -3,14 +3,14 @@ from beanie import init_beanie
 from pymongo.errors import ServerSelectionTimeoutError
 import env
 import sys
-from models.user import User
+from models.user import User_Schema
 
 class Database:
 
   @staticmethod
   async def __init_connection():
     database_client = AsyncIOMotorClient(host=env.DB_HOST,port=env.DB_PORT,username=env.DB_USER, password=env.DB_PASS,connectTimeoutMS=3000, ServerSelectionTimeoutMS=3000)
-    await init_beanie(database=database_client[env.DB_NAME], document_models=[User])
+    await init_beanie(database=database_client[env.DB_NAME], document_models=[User_Schema])
 
   @staticmethod
   async def db_connect():
