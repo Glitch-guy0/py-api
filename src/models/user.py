@@ -53,4 +53,8 @@ class User(Document):
     user_data.model_dump(exclude_none=True)
     user = await User.get_user_by_id(user_id)
     await user.update({"$set": user_data})
-    
+
+  @staticmethod
+  async def delete_user(user_id: PydanticObjectId)-> None:
+    user = await User.get_user_by_id(user_id)
+    user.delete()
