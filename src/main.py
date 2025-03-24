@@ -1,7 +1,15 @@
 from lib.database import Database
-import asyncio
+import uvicorn
+from fastapi import FastAPI
+app = FastAPI()
+from User.route import router as user_route
+
+@app.on_event("startup")
+async def startup():
+  await Database.db_connect()
 
 
+app.include_router(user_route)
 
-asyncio.run(Database.db_connect())
-
+if __name__ == "__main__":
+  uvicorn.run("main:app", reload=True)

@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Request, Response
-router = APIRouter("/user")
+from fastapi import APIRouter, Request, HTTPException, Response
+router = APIRouter(prefix="/user")
 from models.user import User
 
 
 @router.post("/")
-async def create_user(request: Request):
+async def create_user(request: Request, response: Response):
   data = await request.json()
   user_data = User(**data)
   await User.create_user(user_data)
