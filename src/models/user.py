@@ -4,12 +4,10 @@ from pydantic import BaseModel
 from pydantic import Field, EmailStr
 from typing import Annotated, Optional
 from fastapi import HTTPException
-from lib.auth.validations import Validations
 from lib.auth.crypto import Crypto
 
 class Update_User(BaseModel):
   username: Optional[str] = Field(None, min_length=3, max_length=20)
-  password: Optional[str] = None
 
 class Login_Info(BaseModel):
   id: PydanticObjectId
@@ -28,7 +26,6 @@ class User(BaseModel):
   @staticmethod
   async def create_user(user: "User")->None:
     try:
-      Validations.password_validator(user.password)
       hashed_password = Crypto.hash_password(user.password)
       new_user = User_Schema(username=user.username, email=user.email, password=hashed_password)
       await new_user.insert()
@@ -46,7 +43,7 @@ class User(BaseModel):
   
   @staticmethod
   async def get_user_by_id(user_id: PydanticObjectId)-> User_Schema:
-    user = await User_Schema.find_one({"_id": id})
+    user = await User_Schema.find_one({"_id": user_id})
     if not user:
       raise HTTPException(404, "User not Found")
     return user
