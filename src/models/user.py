@@ -9,6 +9,10 @@ from lib.auth.crypto import Crypto
 class Update_User(BaseModel):
   username: Optional[str] = Field(None, min_length=3, max_length=20)
 
+class Login_Data(BaseModel):
+  email: EmailStr
+  password: str = Field(min_length=8, max_length=20)
+
 class Login_Info(BaseModel):
   id: PydanticObjectId
   password: bytes
@@ -21,7 +25,7 @@ class User_Schema(Document):
 class User(BaseModel):
   username: str = Field(min_length=3, max_length=20)
   email: EmailStr
-  password: str
+  password: str = Field(min_length=8, max_length=20)
 
   @staticmethod
   async def create_user(user: "User")->None:
