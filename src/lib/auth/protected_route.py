@@ -1,0 +1,1 @@
+# provides decorator for private routes
