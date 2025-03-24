@@ -23,7 +23,7 @@ class User(Document):
   password: str
 
   @staticmethod
-  async def create_user(user: "User"):
+  async def create_user(user: "User")->None:
     try:
       # todo: validaton checks
       # password to bytes
@@ -33,3 +33,17 @@ class User(Document):
     except Exception as e:
       print("user insertion error: ", e)
       raise HTTPException(500, "server error")
+
+  @staticmethod
+  async def get_user_by_email(email: EmailStr)->Login_Info :
+    user = await User_Schema.find_one({"email": email})
+    if not user:
+      raise HTTPException(404, "User not Found")
+    return Login_Info(id=user.id, password=user.password)
+  
+  @staticmethod
+  async def get_user_by_id(id: PydanticObjectId)-> User_Schema:
+    user = await User_Schema.find_one({"_id": id})
+    if not user:
+      raise HTTPException(404, "User not Found")
+    return user
