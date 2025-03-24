@@ -2,6 +2,7 @@
 import bcrypt
 import random
 from .validations import Validations
+from fastapi import HTTPException
 
 class Crypto:
   @staticmethod
@@ -12,3 +13,7 @@ class Crypto:
 
   def __encode_password(password: str)-> bytes:
     return password.encode("utf-8")
+  
+  def verify_password(password: str, db_password: bytes):
+    if not bcrypt.checkpw(Crypto.__encode_password(password), db_password):
+      raise HTTPException(401, "Unauthorized Access")
