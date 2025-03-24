@@ -5,8 +5,8 @@ from typing import Annotated, Optional
 from fastapi import HTTPException
 
 class Update_User(Document):
-  username: Optional[str] = Field(min_length=3, max_length=20)
-  password: Optional[str]
+  username: Optional[str] = Field(None, min_length=3, max_length=20)
+  password: Optional[str] = None
 
 class Login_Info(Document):
   id: PydanticObjectId
@@ -42,8 +42,15 @@ class User(Document):
     return Login_Info(id=user.id, password=user.password)
   
   @staticmethod
-  async def get_user_by_id(id: PydanticObjectId)-> User_Schema:
+  async def get_user_by_id(user_id: PydanticObjectId)-> User_Schema:
     user = await User_Schema.find_one({"_id": id})
     if not user:
       raise HTTPException(404, "User not Found")
     return user
+  
+  @staticmethod
+  async def update_user(user_id: PydanticObjectId, user_data: Update_User)-> None:
+    user_data.model_dump(exclude_none=True)
+    user = await User.get_user_by_id(user_id)
+    await user.update({"$set": user_data})
+    
