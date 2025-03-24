@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from pydantic import Field, EmailStr
 from typing import Annotated, Optional
 from fastapi import HTTPException
+from lib.auth.validations import Validations
 
 class Update_User(BaseModel):
   username: Optional[str] = Field(None, min_length=3, max_length=20)
@@ -26,7 +27,7 @@ class User(BaseModel):
   @staticmethod
   async def create_user(user: "User")->None:
     try:
-      # todo: validaton checks
+      Validations.password_validator(user.password)
       # password to bytes
       new_user = User_Schema(username=user.username, email=user.email, password=bytes(user.password))
       await new_user.insert()
