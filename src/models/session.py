@@ -8,6 +8,7 @@ class Session_Schema(Document):
   session_token: Annotated[str, Indexed(unique=True)]
   user_id: PydanticObjectId # can be unique to limit logons
 
+class Session:
   @staticmethod
   async def create_session(user_id: PydanticObjectId)-> str:
     token: str = secrets.token_hex(32)
@@ -16,11 +17,11 @@ class Session_Schema(Document):
     return token
 
   @staticmethod
-  async def get_session(session_token: str)-> PydanticObjectId:
+  async def get_session(session_token: str)-> Session_Schema:
     session_data = await Session_Schema.find_one(Session_Schema.session_token == session_token)
     if not session_data:
       raise HTTPException(404, "Session not Found")
-    return session_data.user_id
+    return session_data
 
   @staticmethod
   async def delete_session(session_token: str)->None:
