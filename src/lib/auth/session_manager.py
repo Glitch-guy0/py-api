@@ -3,7 +3,7 @@
 # - JWT tokens
 
 from fastapi import Response, Request, HTTPException
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import jwt
 from models.session import Session, Session_Schema
 import env
@@ -15,7 +15,7 @@ class Session_Manager:
   async def create_session(user_id: PydanticObjectId, fastapi_response: Response)-> None:
     session_token = await Session.create_session(user_id)
     payload = JWT_Payload(auth_token=session_token) # session for user authentication / user session
-    jwt_token: str = jwt.encode(payload, env.JWT_SECRET)
+    jwt_token: str = jwt.encode(payload.to_json(), env.JWT_SECRET)
     await Cookie_Manager.set_jwt_token(jwt_token, fastapi_response)
 
   @staticmethod
@@ -54,8 +54,16 @@ class Session_Manager:
 @dataclass
 class JWT_Payload:
   auth_token: str
-  exp: datetime = datetime.datetime.now() + datetime.timedelta(days=1)
-  iat: datetime = datetime.datetime.now()
+  exp: datetime.datetime = field(default_factory=lambda: datetime.datetime.now() + datetime.timedelta(days=1))
+  iat: datetime.datetime = field(default_factory=datetime.datetime.now)
+
+  def to_json(self):
+     return {
+        "auth_token": self.auth_token,
+        # JWT requires numeric dates
+        "exp": int(self.exp.timestamp()),
+        "iat": int(self.iat.timestamp())
+     }
 
 @dataclass
 class Cookie_Manager:
