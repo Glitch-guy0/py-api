@@ -67,9 +67,7 @@ class Cookie_Manager:
     fastapi_response.set_cookie(
     key=Cookie_Manager.auth_token,
     value=jwt_token,
-    max_age=Cookie_Manager.auth_token_expiry,
-    path="/",             
-    domain="example.com", 
+    max_age=Cookie_Manager.auth_token_expiry,          
     secure=False,  # if using HTTPS  
     httponly=False, # can be acccessed via js
     samesite="lax"        

@@ -8,7 +8,7 @@ from lib.auth.account_manager import Account_Manager
 async def create_user(request: Request, response: Response):
   data = await request.json()
   user_data = User(**data)
-  Account_Manager.create_user(user_data)
+  await Account_Manager.create_user(user_data)
   return {"message": "User Created"}
 
 
@@ -17,5 +17,5 @@ async def login_user(request: Request, response: Response):
   data = await request.json()
   login_data = Login_Data(**data)
   user_data = await Account_Manager.verify_user_login(login_data)
-  Session_Manager.create_session(user_data, response)
+  await Session_Manager.create_session(user_data.id, response)
   return {"detail": "Login Successful"}
