@@ -1,6 +1,7 @@
 from models.user import Login_Info
 from fastapi import Response, Request, HTTPException
 from dataclasses import dataclass
+import jwt
 
 class Session_Manager:
   def create_session(user_info: Login_Info, fastapi_response: Response)-> Response:
