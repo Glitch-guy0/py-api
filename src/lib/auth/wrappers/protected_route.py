@@ -1,6 +1,6 @@
 # provides decorator for private routes
 from fastapi import Request
-from .session_manager import Session_Manager
+from ..session_manager import Session_Manager
 
 def protected_route(fastapi_request: Request):
   def decorator(func):
