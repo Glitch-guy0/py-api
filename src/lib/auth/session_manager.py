@@ -17,7 +17,7 @@ class Session_Manager:
     session_token = await Session.create_session(user_id)
     payload = JWT_Payload(auth_token=session_token) # session for user authentication / user session
     logger.debug("creating jwt payload")
-    jwt_token: str = jwt.encode(payload.to_json(), env.JWT_SECRET)
+    jwt_token: str = jwt.encode(payload.to_json(), env.JWT_SECRET, algorithm="HS256")
     logger.debug("calling cookie-manager to send metadata")
     await Cookie_Manager.set_jwt_token(jwt_token, fastapi_response)
 
@@ -34,27 +34,27 @@ class Session_Manager:
     jwt_cookie = await Cookie_Manager.get_jwt_token(fastapi_request)
     try:
       logger.debug("decoding jwt payload")
-      jwt_payload = JWT_Payload(**jwt.decode(jwt_cookie, env.JWT_SECRET))
+      jwt_payload = JWT_Payload(**jwt.decode(jwt_cookie, env.JWT_SECRET,algorithms=["HS256"]))
       user_session = await Session.get_session(jwt_payload.auth_token)
       return user_session
     
-    except jwt.ExpiredSignatureError:
-        logger.warning("Expired Token")
+    except jwt.ExpiredSignatureError as e:
+        logger.warning(f"Expired Token: {e}")
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidSignatureError:
-        logger.warning("JWT Signature error")
+    except jwt.InvalidSignatureError as e:
+        logger.warning(f"JWT Signature error: {e}")
         raise HTTPException(status_code=401, detail="Invalid token signature")
-    except jwt.DecodeError:
-        logger.error("JWT Decoding error")
+    except jwt.DecodeError as e:
+        logger.error(f"JWT Decoding error: {e}")
         raise HTTPException(status_code=400, detail="Invalid token")
-    except jwt.InvalidAudienceError:
-        logger.warning("audience error")
+    except jwt.InvalidAudienceError as e:
+        logger.warning(f"audience error: {e}")
         raise HTTPException(status_code=403, detail="Invalid token audience")
-    except jwt.InvalidIssuerError:
-        logger.error("invalid issuer error")
+    except jwt.InvalidIssuerError as e:
+        logger.error(f"invalid issuer error: {e}")
         raise HTTPException(status_code=403, detail="Invalid token issuer")
-    except jwt.InvalidTokenError:
-        logger.error("invalid token")
+    except jwt.InvalidTokenError as e:
+        logger.error(f"invalid token: {e}")
         raise HTTPException(status_code=400, detail="Invalid token")
     
     
@@ -72,12 +72,14 @@ class JWT_Payload:
   iat: datetime.datetime = field(default_factory=datetime.datetime.now)
 
   def to_json(self):
-     return {
+     json_payload = {
         "auth_token": self.auth_token,
         # JWT requires numeric dates
         "exp": int(self.exp.timestamp()),
         "iat": int(self.iat.timestamp())
      }
+     logger.debug(f"jwt-payload to json format: {json_payload}")
+     return json_payload
 
 @dataclass
 class Cookie_Manager:
