@@ -5,6 +5,7 @@ from pydantic import Field, EmailStr
 from typing import Annotated, Optional
 from fastapi import HTTPException
 from lib.auth.crypto import Crypto
+from lib.logger import logger
 
 class Update_User(BaseModel):
   username: Optional[str] = Field(None, min_length=3, max_length=20)
@@ -29,36 +30,48 @@ class User(BaseModel):
 
   @staticmethod
   async def create_user(user: "User")->None:
+    logger.debug(f"creating new user: {user}")
     try:
       hashed_password = Crypto.hash_password(user.password)
       new_user = User_Schema(username=user.username, email=user.email, password=hashed_password)
+      logger.debug("storing user into database")
       await new_user.save()
     except HTTPException as e:
+      logger.warning(f"error while storing user data: {e.detail}")
       raise HTTPException(e.status_code, e.detail)
     except Exception as e:
+      logger.critical(f"server error: {e}")
       raise HTTPException(500, "Internal Server Error")
 
   @staticmethod
   async def get_user_by_email(email: EmailStr)->Login_Info :
+    logger.debug("get user id by email")
     user = await User_Schema.find_one({"email": email})
     if not user:
+      logger.warning("user not found")
       raise HTTPException(404, "User not Found")
+    logger.debug("user found")
     return Login_Info(id=user.id, password=user.password)
   
   @staticmethod
   async def get_user_by_id(user_id: PydanticObjectId)-> User_Schema:
+    logger.debug("get user data using user id")
     user = await User_Schema.find_one({"_id": user_id})
     if not user:
+      logger.warning("user not found")
       raise HTTPException(404, "User not Found")
     return user
   
   @staticmethod
   async def update_user(user_id: PydanticObjectId, user_data: Update_User)-> None:
+    logger.info(f"update user reqeust for user id: {user_id}")
     user_data.model_dump(exclude_none=True)
     user = await User.get_user_by_id(user_id)
+    logger.debug(f"user found!, updating user to {user_data}")
     await user.update({"$set": user_data})
 
   @staticmethod
   async def delete_user(user_id: PydanticObjectId)-> None:
+    logger.debug("delete user request")
     user = await User.get_user_by_id(user_id)
     user.delete()

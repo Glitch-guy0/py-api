@@ -5,11 +5,13 @@ import env
 import sys
 from models.user import User_Schema
 from models.session import Session_Schema
+from lib.logger import logger
 
 class Database:
 
   @staticmethod
   async def __init_connection():
+    logger.info("initiation db connection")
     database_client = AsyncIOMotorClient(host=env.DB_HOST,port=env.DB_PORT,username=env.DB_USER, password=env.DB_PASS,connectTimeoutMS=3000, ServerSelectionTimeoutMS=3000)
     await init_beanie(database=database_client[env.DB_NAME], document_models=[User_Schema, Session_Schema])
 
@@ -18,13 +20,13 @@ class Database:
     try:
       await Database.__init_connection()
     except ServerSelectionTimeoutError as conn_err:
-      print("Error Connecting to DB, is it even Running!!")
+      logger.critical("Error Connecting to DB, is it even Running!!")
       sys.exit(1)
     except Exception as e:
-      print("Database connection error", e)
+      logger.error("Database connection error", e)
       sys.exit(1)
     else:
-      print("connected to DB")
+      logger.info("connected to DB")
       
 
 

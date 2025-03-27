@@ -1,13 +1,17 @@
 from fastapi import APIRouter, Request, HTTPException, Response
 router = APIRouter(prefix="/user")
-from models.user import User, Login_Data, Login_Info
+from models.user import User, Login_Data
 from lib.auth.session_manager import Session_Manager
 from lib.auth.account_manager import Account_Manager
+from lib.logger import logger
 
 @router.post("/")
 async def create_user(request: Request, response: Response):
+  logger.info("create user reqeust")
   data = await request.json()
+  logger.debug("parsing http body")
   user_data = User(**data)
+  logger.debug("calling account manager to create user")
   await Account_Manager.create_user(user_data)
   return {"message": "User Created"}
 
