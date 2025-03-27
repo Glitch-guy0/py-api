@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, Response
 router = APIRouter(prefix="/user")
-from models.user import User, Login_Data
+from models.user import User, Login_Data, Update_User
 from lib.auth.session_manager import Session_Manager
 from lib.auth.account_manager import Account_Manager
 from lib.logger import logger
@@ -28,8 +28,10 @@ async def login_user(request: Request, response: Response):
 
 @router.put("/")
 async def update_user(request: Request, response: Response):
-  print("running inside the function")
-
+  logger.info("update user request")
   user_id = await Session_Manager.get_session_user_id(request)
-  print(user_id)
-  return
+  logger.debug(f"got user_id from session-manager: {user_id}")
+  logger.info("Valid User")
+  user_data = Update_User(**await request.json())
+  await User.update_user(user_id,user_data)
+  return {"detail": "Update Successful"}

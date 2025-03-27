@@ -41,7 +41,7 @@ if env.LOG_VERBOSITY == "DEBUG":
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
-# RotatingFileHandler (Logs to File)
+# RotatingFileHandler (Logs to File)                     5MB
 file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5*1024*1024, backupCount=3)
 file_handler.setFormatter(jsonlogger.JsonFormatter(LOG_FORMAT))
 
