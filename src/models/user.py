@@ -1,14 +1,14 @@
 # contains user database related functions
 from beanie import Document, Indexed, PydanticObjectId
 from pymongo.errors import DuplicateKeyError
-from pydantic import BaseModel
-from pydantic import Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import Annotated, Optional
 from fastapi import HTTPException
 from lib.auth.crypto import Crypto
 from lib.logger import logger
 
 class Update_User(BaseModel):
+  model_config = ConfigDict(extra='forbid')
   username: Optional[str] = Field(None, min_length=3, max_length=20)
 
 class Login_Data(BaseModel):
