@@ -5,16 +5,22 @@ from lib.auth.session_manager import Session_Manager
 from lib.auth.account_manager import Account_Manager
 from lib.logger import logger
 from lib.auth.session_manager import Session_Manager
+from pydantic import ValidationError
 
 @router.post("/")
 async def create_user(request: Request, response: Response):
   logger.info("create user reqeust")
   data = await request.json()
   logger.debug("parsing http body")
-  user_data = User(**data)
+  try:
+    user_data = User(**data)
+  except ValidationError as e:
+    for error in e.errors():
+      logger.warning(f"body-data Validation error: {error}")
+      raise HTTPException(422, error.get('msg'))
   logger.debug("calling account manager to create user")
   await Account_Manager.create_user(user_data)
-  return {"message": "User Created"}
+  return {"detail": "User Created"}
 
 
 @router.get("/")
