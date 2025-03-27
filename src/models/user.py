@@ -1,5 +1,6 @@
 # contains user database related functions
 from beanie import Document, Indexed, PydanticObjectId
+from pymongo.errors import DuplicateKeyError
 from pydantic import BaseModel
 from pydantic import Field, EmailStr
 from typing import Annotated, Optional
@@ -35,13 +36,10 @@ class User(BaseModel):
       hashed_password = Crypto.hash_password(user.password)
       new_user = User_Schema(username=user.username, email=user.email, password=hashed_password)
       logger.debug("storing user into database")
-      await new_user.save()
-    except HTTPException as e:
-      logger.warning(f"error while storing user data: {e.detail}")
-      raise HTTPException(e.status_code, e.detail)
-    except Exception as e:
-      logger.critical(f"server error: {e}")
-      raise HTTPException(500, "Internal Server Error")
+      await new_user.insert()
+    except DuplicateKeyError as e:
+      logger.info("User already exists")
+      raise HTTPException(409, "User already exists")
 
   @staticmethod
   async def get_user_by_email(email: EmailStr)->Login_Info :
