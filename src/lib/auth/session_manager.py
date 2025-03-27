@@ -25,7 +25,7 @@ class Session_Manager:
   async def get_session_user_id(fastapi_request: Request)-> PydanticObjectId:
      logger.info("user_id request from session-manager")
      user_session = await Session_Manager.get_session(fastapi_request)
-     return user_session.id
+     return user_session.user_id
   
 
   @staticmethod
