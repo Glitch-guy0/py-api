@@ -51,3 +51,14 @@ async def update_user(request: Request, response: Response):
       raise HTTPException(422, error.get('msg'))
   await User.update_user(user_id,user_data)
   return {"detail": "Update Successful"}
+
+
+@router.delete("/")
+async def delete_user(request: Request, response: Response):
+  logger.info("user deleting request")
+  user_id = await Session_Manager.get_session_user_id(request)
+  logger.debug(f"got user_id from session-manager: {user_id}")
+  logger.info("Deleting User")
+  await Account_Manager.delete_user(user_id)
+  await Session_Manager.delete_session(request, response)
+  return {"detail": "Deleted User"}

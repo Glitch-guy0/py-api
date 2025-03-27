@@ -2,6 +2,7 @@ from models.user import Login_Info, Login_Data, User
 from lib.auth.validations import Validations
 from .crypto import Crypto
 from lib.logger import logger
+from beanie import PydanticObjectId
 
 class Account_Manager:
 
@@ -20,3 +21,8 @@ class Account_Manager:
     Crypto.verify_password(login_data.password, user.password)
     logger.info('user login successful')
     return user
+  
+  @staticmethod
+  async def delete_user(user_id:PydanticObjectId)->None:
+    logger.debug(f"deleting user: {user_id}")
+    await User.delete_user(user_id)

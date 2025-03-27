@@ -72,4 +72,6 @@ class User(BaseModel):
   async def delete_user(user_id: PydanticObjectId)-> None:
     logger.debug("delete user request")
     user = await User.get_user_by_id(user_id)
+    if not user:
+      raise HTTPException(404, "User not Found")
     user.delete()

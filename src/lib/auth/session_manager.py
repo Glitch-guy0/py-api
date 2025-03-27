@@ -64,6 +64,7 @@ class Session_Manager:
     logger.debug("calling session-manager to get current session")
     user_session = await Session_Manager.get_session(fastapi_request)
     await Session.delete_session(user_session.session_token)
+    await Cookie_Manager.delete_jwt_token(fastapi_response)
 
 @dataclass
 class JWT_Payload:
