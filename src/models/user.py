@@ -58,7 +58,7 @@ class User(BaseModel):
     logger.debug("get user data using user id")
     user = await User_Schema.find_one({"_id": user_id})
     if not user:
-      logger.warning("user not found")
+      logger.warning(f"user not found: {user}")
       raise HTTPException(404, "User not Found")
     return user
   

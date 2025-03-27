@@ -26,7 +26,7 @@ class Session:
     session_data = await Session_Schema.find_one(Session_Schema.session_token == session_token)
     if not session_data:
       logger.warning("user session not found")
-      raise HTTPException(404, "Session not Found")
+      raise HTTPException(404, "Login required. Your session may have timed out.")
     logger.debug("found user session")
     return session_data
 
