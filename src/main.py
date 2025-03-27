@@ -3,6 +3,7 @@ import uvicorn
 from fastapi import FastAPI
 app = FastAPI()
 from User.route import router as user_route
+from lib.logger import logger
 
 @app.on_event("startup")
 async def startup():
