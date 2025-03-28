@@ -10,12 +10,15 @@ services:
       - mongodb
     volumes:
       - "./logs:/home/app/logs"
+    build:
+      context: .
+      dockerfile: dockerfile
 
   mongodb:
     image: mongodb/mongodb-community-server:latest
     container_name: py-api-mongodb
-    ports:
-      - '27017:27017'
+    expose:
+      - 27017
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
