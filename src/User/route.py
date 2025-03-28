@@ -62,3 +62,11 @@ async def delete_user(request: Request, response: Response):
   await Account_Manager.delete_user(user_id)
   await Session_Manager.delete_session(request, response)
   return {"detail": "Deleted User"}
+
+
+@router.post("/logout")
+async def logout_user(request: Request, response: Response):
+  logger.info("logout reqeust")
+  user_id = await Session_Manager.get_session_user_id(request)
+  await Session_Manager.delete_session(request, response)
+  return {"detail": "Logged Out"}
