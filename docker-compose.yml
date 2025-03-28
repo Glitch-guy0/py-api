@@ -1,6 +1,16 @@
 
 
 services:
+  application:
+    image: py-api:latest
+    container_name: py-api-server
+    ports:
+      - '8000:8000'
+    depends_on:
+      - mongodb
+    volumes:
+      - "./logs:/home/app/logs"
+
   mongodb:
     image: mongodb/mongodb-community-server:latest
     container_name: py-api-mongodb
