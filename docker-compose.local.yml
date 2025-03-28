@@ -1,0 +1,22 @@
+services:
+
+    applicaton:
+      image: py-api:dev
+      container_name: py-api-development-application
+      ports:
+        - '8000:8000'
+      build:
+        context: .
+        dockerfile: dockerfile.local
+      volumes:
+        - "./logs:/home/app/logs"
+        - "./src:/home/app/src:ro"
+      
+    mongodb:
+      image: mongodb/mongodb-community-server:latest
+      container_name: py-api-mongodb
+      ports:
+        - '27017:27017'
+      environment:
+        - MONGO_INITDB_ROOT_USERNAME=admin
+        - MONGO_INITDB_ROOT_PASSWORD=admin
