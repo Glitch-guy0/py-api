@@ -12,7 +12,6 @@ services:
 
   application:
     image: py-api:latest
-    # container_name: py-api-server
     expose:
       - 8000
     depends_on:
