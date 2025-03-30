@@ -1,11 +1,20 @@
 
 
 services:
+  api-geteway:
+    image: nginx:latest
+    ports:
+      - '8000:80'
+    volumes:
+      - './api-gateway:/etc/nginx/'
+    depends_on:
+      - application
+
   application:
     image: py-api:latest
-    container_name: py-api-server
-    ports:
-      - '8000:8000'
+    # container_name: py-api-server
+    expose:
+      - 8000
     depends_on:
       - mongodb
     volumes:
@@ -13,6 +22,8 @@ services:
     build:
       context: .
       dockerfile: dockerfile
+    deploy:
+      replicas: 3
 
   mongodb:
     image: mongodb/mongodb-community-server:latest
