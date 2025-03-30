@@ -12,7 +12,7 @@ async def startup():
 
 app.include_router(user_route)
 
-@app.get("/")
+@app.get("")
 def root():
   return "Server Running"
 

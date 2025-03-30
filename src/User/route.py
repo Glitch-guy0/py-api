@@ -7,7 +7,7 @@ from lib.logger import logger
 from lib.auth.session_manager import Session_Manager
 from pydantic import ValidationError
 
-@router.post("/")
+@router.post("")
 async def create_user(request: Request, response: Response):
   logger.info("create user reqeust")
   data = await request.json()
@@ -23,7 +23,7 @@ async def create_user(request: Request, response: Response):
   return {"detail": "User Created"}
 
 
-@router.get("/")
+@router.get("")
 async def login_user(request: Request, response: Response):
   data = await request.json()
   try:
@@ -37,7 +37,7 @@ async def login_user(request: Request, response: Response):
   return {"detail": "Login Successful"}
 
 
-@router.put("/")
+@router.put("")
 async def update_user(request: Request, response: Response):
   logger.info("update user request")
   user_id = await Session_Manager.get_session_user_id(request)
@@ -53,7 +53,7 @@ async def update_user(request: Request, response: Response):
   return {"detail": "Update Successful"}
 
 
-@router.delete("/")
+@router.delete("")
 async def delete_user(request: Request, response: Response):
   logger.info("user deleting request")
   user_id = await Session_Manager.get_session_user_id(request)
