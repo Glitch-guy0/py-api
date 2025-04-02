@@ -6,7 +6,7 @@ from fastapi import Response, Request, HTTPException
 from dataclasses import dataclass, field
 import jwt
 from models.session import Session, Session_Schema
-import env
+from env import Environment
 from beanie import PydanticObjectId
 import datetime
 from lib.logger import logger
@@ -17,7 +17,7 @@ class Session_Manager:
     session_token = await Session.create_session(user_id)
     payload = JWT_Payload(auth_token=session_token) # session for user authentication / user session
     logger.debug("creating jwt payload")
-    jwt_token: str = jwt.encode(payload.to_json(), env.JWT_SECRET, algorithm="HS256")
+    jwt_token: str = jwt.encode(payload.to_json(), Environment.env.get('JWT_SECRET'), algorithm="HS256")
     logger.debug("calling cookie-manager to send metadata")
     await Cookie_Manager.set_jwt_token(jwt_token, fastapi_response)
 
@@ -34,7 +34,7 @@ class Session_Manager:
     jwt_cookie = await Cookie_Manager.get_jwt_token(fastapi_request)
     try:
       logger.debug("decoding jwt payload")
-      jwt_payload = JWT_Payload(**jwt.decode(jwt_cookie, env.JWT_SECRET,algorithms=["HS256"]))
+      jwt_payload = JWT_Payload(**jwt.decode(jwt_cookie, Environment.env.get('JWT_SECRET'),algorithms=["HS256"]))
       user_session = await Session.get_session(jwt_payload.auth_token)
       return user_session
     

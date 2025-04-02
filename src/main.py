@@ -6,16 +6,17 @@ from typing import Optional
 from lib.database import Database
 from lib.logger import logger
 from User.route import router as user_route
-
+from env import Environment
 
 @asynccontextmanager
-async def lifesapn(app: FastAPI):
+async def lifespan(app: FastAPI):
     """
     Initialize database connection on application startup.
     Exits the application if database connection fails.
     """
     try:
         await Database.db_connect()
+        Environment.load_env()
         logger.info("Application startup completed successfully")
     except Exception as e:
         logger.critical(f"Failed to start application: {str(e)}")
@@ -28,7 +29,7 @@ app = FastAPI(
     title="User Management API",
     description="API for managing user accounts and sessions",
     version="1.0.0",
-    lifespan=lifesapn
+    lifespan=lifespan
 )
 
 # Include routers

@@ -1,7 +1,17 @@
-DB_NAME='py-api'
-DB_USER='admin'
-DB_PASS='admin'
-DB_HOST='mongodb'
-DB_PORT=27017
-JWT_SECRET="secretCode"
-LOG_VERBOSITY="DEBUG"              # can be (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+from dotenv import dotenv_values
+from pathlib import Path
+import os
+
+class Environment:
+  env = {}
+
+  @staticmethod
+  def load_env():
+    secrets_path = os.getenv('SECRETS_PATH')
+    if not secrets_path:
+      raise ValueError('SECRETS_PATH environment variable is not set')
+    secrets_path = Path(secrets_path)
+    if not secrets_path.is_file():
+      raise FileNotFoundError(f'{secrets_path} does not exist')
+    Environment.env = dotenv_values(secrets_path)
+    

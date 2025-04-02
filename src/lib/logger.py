@@ -11,7 +11,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pythonjsonlogger import jsonlogger
 import sys
-import env
+from env import Environment
 import os
 
 # Define the log format
@@ -33,8 +33,8 @@ os.makedirs(LOG_DIR, exist_ok=True)  # Creates directory if it doesn't exist
 
 # Create a logger
 logger = logging.getLogger("fastapi_app")
-if env.LOG_VERBOSITY == "DEBUG":
-  logger.setLevel(LOG_LEVELS.get(env.LOG_VERBOSITY, logging.INFO))  # Set logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+if Environment.env.get('LOG_VERBOSITY') == "DEBUG":
+  logger.setLevel(LOG_LEVELS.get(Environment.env.get('LOG_VERBOSITY'), logging.INFO))  # Set logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
   
 
 # StreamHandler (Logs to Console)
