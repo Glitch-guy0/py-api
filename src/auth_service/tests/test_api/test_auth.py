@@ -11,7 +11,9 @@ app.include_router(auth_route)
 
 @pytest.mark.asyncio
 async def test_register_user():
-    async with AsyncClient(transport=ASGITransport(app=app)) as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         response = await ac.get("/login")
         assert response.status_code == 302
         assert response.headers["Location"] == config.okta_authorize_redirect_uri
