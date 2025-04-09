@@ -29,7 +29,12 @@ async def test_login_route():
     ) as ac:
         response = await ac.get("/login")
         assert response.status_code == 302
-        assert response.headers["Location"] == config.okta_authorize_redirect_uri
+        assert config.okta_authorize_redirect_uri in response.headers["Location"]
+        assert "state=" in response.headers["Location"]
+        assert "client_id=" in response.headers["Location"]
+        assert "response_type=" in response.headers["Location"]
+        assert "scope=" in response.headers["Location"]
+        assert "redirect_uri=" in response.headers["Location"]
 
 
 @pytest.mark.asyncio
