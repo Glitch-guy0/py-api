@@ -37,5 +37,7 @@ async def test_auth_callback_route():
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
-        response = await ac.get("/oauth/v2/callback", params={"code": "test_code", "state": "something"})
+        response = await ac.get(
+            "/oauth/v2/callback", params={"code": "test_code", "state": "something"}
+        )
         assert response.status_code == 200
