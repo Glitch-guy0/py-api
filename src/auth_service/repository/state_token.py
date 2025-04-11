@@ -11,7 +11,7 @@ class StateTokenRepository:
 
     async def get_state_token(self):
         try:
-            await StateToken.get_state_token(self.user_ip, self.token)
+            await StateToken.get_state_token(**self.__dict__)
             return self.token
         except Exception as e:
             raise e
