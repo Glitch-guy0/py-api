@@ -28,5 +28,5 @@ class StateToken(Document):
         token = await StateToken.find_one(StateToken.user_ip == user_ip)
         if not token:
             raise HTTPException(status_code=401, detail="Unauthorized: Token not found")
-        
+
         return token.state_token

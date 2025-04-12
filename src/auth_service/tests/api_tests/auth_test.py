@@ -5,7 +5,6 @@ from fastapi import FastAPI
 
 
 config = {
-    "client_id": "test_client_id",
     "okta_authorize_redirect_uri": "http://test/oauth/v2/callback",
 }
 
@@ -29,7 +28,9 @@ async def test_login_route():
     ) as ac:
         response = await ac.get("/login")
         assert response.status_code == 302
-        assert config.okta_authorize_redirect_uri in response.headers["Location"]
+        url = config.get("okta_authorize_redirect_uri")
+        assert url is not None
+        assert url in response.headers["Location"]
         assert "state=" in response.headers["Location"]
         assert "client_id=" in response.headers["Location"]
         assert "response_type=" in response.headers["Location"]
