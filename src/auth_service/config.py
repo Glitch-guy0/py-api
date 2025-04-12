@@ -4,16 +4,13 @@ from dotenv import find_dotenv
 import sys
 from typing import Optional
 
-# alias choices for okta redirect uri
-OKTA_REDIRECT_URI_ALIAS = AliasChoices(
-    "OKTA_AUTHORIZE_REDIRECT_URI", "OKTA_AUTHORIZE_URI"
-)
-
 
 class System_Environment(BaseSettings):
     model_config = SettingsConfigDict(env_file=find_dotenv())
 
-    # environment schema
+    service_name: str = Field("auth_service", validation_alias="SERVICE_NAME")
+
+    # logging config
     log_file_path: Optional[str] = Field(
         "logs/auth_service.log", validation_alias="LOG_FILE_PATH"
     )
@@ -21,10 +18,17 @@ class System_Environment(BaseSettings):
         5 * 1024 * 1024, validation_alias="LOG_MAX_BYTES"
     )  # 5 MB
     log_backup_count: Optional[int] = Field(3, validation_alias="LOG_BACKUP_COUNT")
-    service_name: str = Field("auth_service", validation_alias="SERVICE_NAME")
+
+    # okta config
+    okta_authorize_uri: str = Field(..., validation_alias="OKTA_AUTHORIZE_URI")
     okta_authorize_redirect_uri: str = Field(
-        ..., validation_alias=OKTA_REDIRECT_URI_ALIAS
+        ..., validation_alias="OKTA_AUTHORIZE_REDIRECT_URI"
     )
+    okta_client_id: str = Field(..., validation_alias="OKTA_CLIENT_ID")
+    okta_client_secret: str = Field(..., validation_alias="OKTA_CLIENT_SECRET")
+    okta_token_uri: str = Field(..., validation_alias="OKTA_TOKEN_URI")
+    okta_userdata_uri: str = Field(..., validation_alias="OKTA_USERDATA_URI")
+    okta_jwks_uri: str = Field(..., validation_alias="OKTA_JWKS_URI")
 
 
 try:
