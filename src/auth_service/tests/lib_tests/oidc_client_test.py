@@ -27,6 +27,7 @@ def test_authorize_redirect(oidc_client):
         scope="email", state=state_token
     )
     redirect_url = redirect_url_string.headers["Location"]
+    # todo(improvement): replace with url builder
     assert redirect_url is not None
     assert "client_id" in redirect_url
     assert "redirect_uri" in redirect_url
@@ -35,27 +36,53 @@ def test_authorize_redirect(oidc_client):
     assert "state" in redirect_url
 
 
-# todo: make this async, remove request library replace with httpx async mock
-def test_request_access_token[T](oidc_client, mocker):
+def test_request_access_token(oidc_client, mocker):
     code = "test_code"
-    request_mock = mocker.patch(
-        "auth_service.lib.oidc_client.requests.post", return_value=T
-    )
-    oidc_client.request_access_token(code)
-    request_mock.assert_called_once_with(
+    expected_json_data = {"access_token": "some token", "id_token": "someother data"}
+    ###
+    # data mock
+    response_data_mock = mocker.Mock()  # think of it as response class
+    response_data_mock.json = expected_json_data  # it contains .json value (dataclass)
+
+    # (function mock)  .post is an async function so
+    async_request_mock = mocker.AsyncMock()
+    async_request_mock.post.return_value = response_data_mock  # when you call `client.get()` it will return the response data
+
+    # (mock implemented)
+    mocker.patch(
+        "auth_service.lib.oidc_client.AsyncClient", return_value=async_request_mock
+    )  # module is replace with mock
+    response = oidc_client.request_access_token(code)
+    # todo: test for request exception and unauthorized exception
+    ###
+    async_request_mock.post.assert_called_once_with(
         oidc_client.token_uri,
         data={"code": code, "grant_type": "authorization_code"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
+    assert response == expected_json_data
 
 
-def test_request_userdata[T](oidc_client, mocker):
+def test_request_userdata(oidc_client, mocker):
     access_token = "test_token"
-    request_mock = mocker.patch(
-        "auth_service.lib.oidc_client.requests.post", return_value=T
+    some_user_data = {"some": "data", "other": "data", "another": "data"}
+    ###
+    return_data_mock = mocker.Mock()
+    return_data_mock.json.return_value = (
+        some_user_data  # because you get this data as `response.json()` so
     )
-    oidc_client.request_userdata(access_token)
-    request_mock.assert_called_once_with(
+
+    async_request_mock = mocker.AsyncMock()
+    async_request_mock.get.return_value = return_data_mock
+
+    mocker.patch(
+        "auth_service.lib.oidc_client.AsyncClient", return_value=async_request_mock
+    )
+
+    response = oidc_client.request_userdata(access_token)
+    ###
+    async_request_mock.get.assert_called_once_with(
         oidc_client.userinfo_uri,
         headers={"Authorization": f"Bearer {access_token}"},
     )
+    assert response == some_user_data
