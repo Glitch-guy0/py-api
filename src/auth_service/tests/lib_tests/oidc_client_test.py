@@ -10,7 +10,7 @@ data = {
     "token_uri": "test_token_uri",
     "userinfo_uri": "test_userinfo_uri",
     "jwks_uri": "test_jwks_uri",
-    "scope": ["email", "profile"],
+    "scope": set(["email", "profile"]),
 }
 
 state_token = "sample_token"
@@ -43,7 +43,7 @@ def oidc_client():
     return client
 
 
-def test_oidc_client_authorize_redirect(oidc_client):
+def test_authorize_redirect(oidc_client):
     redirct_url_string = oidc_client.authorize_redirect(
         scope="email", state=state_token
     )
