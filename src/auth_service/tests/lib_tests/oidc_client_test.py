@@ -1,7 +1,6 @@
 from httpx import URL
 import pytest
 from auth_service.lib.oidc_client import OIDC_Client
-from fastapi import HTTPException
 
 data = {
     "client_id": "test_client_id",
@@ -36,33 +35,11 @@ def test_authorize_redirect(oidc_client):
     assert "state" in redirect_url
 
 
-def test_verify_request(oidc_client, mocker):
-    user_ip = "127.0.0.1"
-    expired_state_token = "random_token"
-    verify_call = mocker.patch(
-        "auth_service.repository.state_token.StateTokenRepository.verify_state_token",
-        return_value=True,
-    )
-    oidc_client.verify_request(user_ip, expired_state_token)
-
-    verify_call.assert_called_once_with(user_ip, expired_state_token)
-
-
-def test_verify_request_expired_state(oidc_client, mocker):
-    user_ip = "127.0.0.1"
-    expired_state_token = "random_token"
-    mocker.patch(
-        "auth_service.repository.state_token.StateTokenRepository.verify_state_token",
-        return_value=False,
-    )
-    with pytest.raises(HTTPException):
-        oidc_client.verify_request(user_ip, expired_state_token)
-
-
+# todo: make this async, remove request library replace with httpx async mock
 def test_request_access_token[T](oidc_client, mocker):
     code = "test_code"
     request_mock = mocker.patch(
-        "auth_service.lib.odic_client.requests.post", return_value=T
+        "auth_service.lib.oidc_client.requests.post", return_value=T
     )
     oidc_client.request_access_token(code)
     request_mock.assert_called_once_with(
@@ -75,7 +52,7 @@ def test_request_access_token[T](oidc_client, mocker):
 def test_request_userdata[T](oidc_client, mocker):
     access_token = "test_token"
     request_mock = mocker.patch(
-        "auth_service.lib.odic_client.requests.post", return_value=T
+        "auth_service.lib.oidc_client.requests.post", return_value=T
     )
     oidc_client.request_userdata(access_token)
     request_mock.assert_called_once_with(

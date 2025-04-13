@@ -22,7 +22,8 @@ class StateTokenRepository:
             logger.error(f"Failed to save state token, error: {str(e)}")
             raise e
 
-    async def verify_state_token(self, user_ip: str, state_token: str) -> None:
+    @staticmethod
+    async def verify_state_token(user_ip: str, state_token: str) -> None:
         try:
             logger.debug("Verifying state token")
             token = await StateToken.get_token(user_ip)
