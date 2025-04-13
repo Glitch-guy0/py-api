@@ -1,6 +1,7 @@
 from httpx import URL
 import pytest
 from auth_service.lib.oidc_client import OIDC_Client
+from urllib.parse import urlparse, parse_qs
 
 data = {
     "client_id": "test_client_id",
@@ -13,7 +14,26 @@ data = {
     "jwks_uri": "test_jwks_uri",
 }
 
-state_token = "sample_token"
+
+def compare_urls(url1: str, url2: str) -> bool:
+    # Parse both URLs
+    parsed1 = urlparse(url1)
+    parsed2 = urlparse(url2)
+
+    # Compare scheme, hostname, path (ignore params for now)
+    if (
+        parsed1.scheme != parsed2.scheme
+        or parsed1.netloc != parsed2.netloc
+        or parsed1.path != parsed2.path
+    ):
+        return False
+
+    # Parse query strings into dicts
+    query1 = parse_qs(parsed1.query)
+    query2 = parse_qs(parsed2.query)
+
+    # Return True only if all keys and values match
+    return query1 == query2
 
 
 @pytest.fixture
@@ -23,17 +43,27 @@ def oidc_client():
 
 
 def test_authorize_redirect(oidc_client):
+    state_token = "sample_token"
+    scope = "email"
+    expected_params = {
+        "client_id": oidc_client.client_id,
+        "response_type": "code",
+        "scope": scope,
+        "redirect_uri": oidc_client.authorize_redirect_uri,
+        "state": state_token,
+    }
+    expected_url = URL(oidc_client.authorize_uri)
+    expected_url = expected_url.copy_merge_params(expected_params)
+    ###
     redirect_url_string = oidc_client.authorization_redirect(
-        scope="email", state=state_token
+        scope=scope, state=state_token
     )
     redirect_url = redirect_url_string.headers["Location"]
-    # todo(improvement): replace with url builder
+    ###
     assert redirect_url is not None
-    assert "client_id" in redirect_url
-    assert "redirect_uri" in redirect_url
-    assert "response_type" in redirect_url
-    assert "scope" in redirect_url
-    assert "state" in redirect_url
+    assert compare_urls(
+        str(expected_url), str(redirect_url)
+    ), "redirect url is not equal to expected url"
 
 
 def test_request_access_token(oidc_client, mocker):
