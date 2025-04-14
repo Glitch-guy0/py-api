@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from starlette.responses import RedirectResponse
-from httpx import URL
+from httpx import URL, AsyncClient, TimeoutException
 from .logger import logger
 
 
@@ -40,3 +40,34 @@ class OIDC_Client:
         url = url.copy_merge_params(params)
         logger.debug(f"Redirect URL generated: {url}")
         return RedirectResponse(url=str(url))
+
+    async def request_access_token(self, code: str) -> str:
+        params = {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "code": code,
+            "grant_type": "authorization_code",
+        }
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
+        }
+        try:
+            async with AsyncClient() as client:
+                response = await client.post(
+                    self.token_uri, data=params, headers=headers
+                )
+                json_data = await response.json()
+                return json_data["access_token"]
+        except TimeoutException as e:
+            logger.error(f"Timeout error requesting access token: {e}")
+            # todo: add http exception
+            raise e
+        except KeyError as e:
+            logger.error(f"Key error requesting access token: {e}")
+            # todo: add http exception
+            raise e
+        except Exception as e:
+            logger.error(f"Error requesting access token: {e}")
+            # todo: add http exception
+            raise e
