@@ -47,7 +47,7 @@ class OIDC_Client[UserDataType]:
             "client_secret": self.client_secret,
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": self.application_redirect_uri
+            "redirect_uri": self.application_redirect_uri,
         }
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",

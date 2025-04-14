@@ -27,12 +27,10 @@ async def user_login(request: Request) -> RedirectResponse:
 
 
 @router.get("/callback")
-async def user_callback(
-    request: Request, code: str, state: str
-):
+async def user_callback(request: Request, code: str, state: str):
     if not request.client:
         raise HTTPException(status_code=400, detail="Client not found")
-    # await StateTokenRepository.verify_state_token(request.client.host, state)
+    await StateTokenRepository.verify_state_token(request.client.host, state)
     access_token = await okta_client.request_access_token(code)
     user_data = await okta_client.request_userdata(access_token)
     return user_data

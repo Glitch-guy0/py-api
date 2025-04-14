@@ -94,7 +94,7 @@ async def test_request_access_token(oidc_client, mocker):
             "client_secret": oidc_client.client_secret,
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": oidc_client.application_redirect_uri
+            "redirect_uri": oidc_client.application_redirect_uri,
         },
         headers={
             "Content-Type": "application/x-www-form-urlencoded",
