@@ -30,6 +30,11 @@ class System_Environment(BaseSettings):
     okta_userinfo_uri: str = Field(..., validation_alias="OKTA_USERINFO_URI")
     okta_jwks_uri: str = Field(..., validation_alias="OKTA_JWKS_URI")
 
+    # mongo config
+    mongo_uri: str = Field(..., validation_alias="MONGO_URI")
+    mongo_port: int = Field(..., validation_alias="MONGO_PORT")
+    mongo_db_name: str = Field(..., validation_alias="MONGO_DB_NAME")
+
 
 try:
     config = System_Environment()  # type: ignore
