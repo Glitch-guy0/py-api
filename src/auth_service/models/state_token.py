@@ -1,5 +1,6 @@
 from beanie import Document, Indexed
 from beanie.exceptions import DocumentAlreadyCreated
+from typing import Annotated
 import datetime
 
 from fastapi import HTTPException
@@ -8,7 +9,7 @@ from fastapi import HTTPException
 class StateToken(Document):
     state_token: str
     user_ip: str
-    created_at: int = Indexed(expireAfterSeconds=15)
+    created_at: Annotated[datetime.datetime, Indexed(expireAfterSeconds=15)]
 
     @classmethod
     async def save_token(cls, user_ip: str, state_token: str) -> str:
