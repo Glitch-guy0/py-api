@@ -105,26 +105,32 @@ async def test_request_access_token(oidc_client, mocker):
     ), "response is not equal to expected json data"
 
 
-def test_request_userdata(oidc_client, mocker):
+@pytest.mark.asyncio
+async def test_request_userdata(oidc_client, mocker):
     access_token = "test_token"
     some_user_data = {"some": "data", "other": "data", "another": "data"}
     ###
     return_data_mock = mocker.Mock()
-    return_data_mock.json.return_value = (
-        some_user_data  # because you get this data as `response.json()` so
-    )
+    return_data_mock.json = mocker.AsyncMock(return_value=some_user_data)
 
     async_request_mock = mocker.AsyncMock()
     async_request_mock.get.return_value = return_data_mock
 
+    connection_mock = mocker.AsyncMock()
+    connection_mock.__aenter__.return_value = async_request_mock
+    connection_mock.__aexit__.return_value = None
+
     mocker.patch(
-        "auth_service.lib.oidc_client.AsyncClient", return_value=async_request_mock
+        "auth_service.lib.oidc_client.AsyncClient", return_value=connection_mock
     )
 
-    response = oidc_client.request_userdata(access_token)
+    response = await oidc_client.request_userdata(access_token)
     ###
     async_request_mock.get.assert_called_once_with(
         oidc_client.userinfo_uri,
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json",
+        },
     )
     assert response == some_user_data
