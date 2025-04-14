@@ -72,7 +72,7 @@ async def test_request_access_token(oidc_client, mocker):
     expected_json_data = {"access_token": "some token", "id_token": "someother data"}
     ###
     response_data_mock = mocker.Mock()
-    response_data_mock.json = mocker.AsyncMock(return_value=expected_json_data)
+    response_data_mock.json = mocker.Mock(return_value=expected_json_data)
 
     async_request_mock = mocker.AsyncMock()
     async_request_mock.post.return_value = response_data_mock
@@ -94,6 +94,7 @@ async def test_request_access_token(oidc_client, mocker):
             "client_secret": oidc_client.client_secret,
             "code": code,
             "grant_type": "authorization_code",
+            "redirect_uri": oidc_client.application_redirect_uri
         },
         headers={
             "Content-Type": "application/x-www-form-urlencoded",
@@ -111,7 +112,7 @@ async def test_request_userdata(oidc_client, mocker):
     some_user_data = {"some": "data", "other": "data", "another": "data"}
     ###
     return_data_mock = mocker.Mock()
-    return_data_mock.json = mocker.AsyncMock(return_value=some_user_data)
+    return_data_mock.json = mocker.Mock(return_value=some_user_data)
 
     async_request_mock = mocker.AsyncMock()
     async_request_mock.get.return_value = return_data_mock

@@ -47,6 +47,7 @@ class OIDC_Client[UserDataType]:
             "client_secret": self.client_secret,
             "code": code,
             "grant_type": "authorization_code",
+            "redirect_uri": self.application_redirect_uri
         }
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -57,14 +58,14 @@ class OIDC_Client[UserDataType]:
                 response = await client.post(
                     self.token_uri, data=params, headers=headers
                 )
-                json_data = await response.json()
+                json_data = response.json()
                 return json_data["access_token"]
         except TimeoutException as e:
             logger.error(f"Timeout error requesting access token: {e}")
             # todo: add http exception
             raise e
         except KeyError as e:
-            logger.error(f"Key error requesting access token: {e}")
+            logger.error(f"Key error access token not found!: {e}")
             # todo: add http exception
             raise e
         except Exception as e:
@@ -81,7 +82,7 @@ class OIDC_Client[UserDataType]:
         try:
             async with AsyncClient() as client:
                 response = await client.get(self.userinfo_uri, headers=headers)
-                json_data: UserDataType = await response.json()
+                json_data: UserDataType = response.json()
                 logger.debug(f"User data received: {json_data}")
                 return json_data
         except TimeoutException as e:
