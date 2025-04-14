@@ -10,7 +10,7 @@ async def test_get_state_token(mocker):
     db_call = mocker.patch(
         "auth_service.models.state_token.StateToken.save_token", return_value=None
     )
-    token = await StateTokenRepository(user_ip).get_state_token()
+    token = await StateTokenRepository.get_state_token(user_ip)
     ###
     assert token is not None
     assert len(token) == 32

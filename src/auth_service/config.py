@@ -21,13 +21,13 @@ class System_Environment(BaseSettings):
 
     # okta config
     okta_authorize_uri: str = Field(..., validation_alias="OKTA_AUTHORIZE_URI")
-    okta_authorize_redirect_uri: str = Field(
-        ..., validation_alias="OKTA_AUTHORIZE_REDIRECT_URI"
+    okta_application_redirect_uri: str = Field(
+        ..., validation_alias="OKTA_APPLICATION_REDIRECT_URI"
     )
     okta_client_id: str = Field(..., validation_alias="OKTA_CLIENT_ID")
     okta_client_secret: str = Field(..., validation_alias="OKTA_CLIENT_SECRET")
     okta_token_uri: str = Field(..., validation_alias="OKTA_TOKEN_URI")
-    okta_userdata_uri: str = Field(..., validation_alias="OKTA_USERDATA_URI")
+    okta_userinfo_uri: str = Field(..., validation_alias="OKTA_USERINFO_URI")
     okta_jwks_uri: str = Field(..., validation_alias="OKTA_JWKS_URI")
 
 

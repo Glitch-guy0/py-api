@@ -7,7 +7,7 @@ data = {
     "client_id": "test_client_id",
     "client_secret": "test_client_secret",
     "authorize_uri": "test_redirect_uri",
-    "authorize_redirect_uri": "test_authorize_redirect_uri",
+    "application_redirect_uri": "test_application_redirect_uri",
     "scope": set(["email", "profile"]),
     "token_uri": "test_token_uri",
     "userinfo_uri": "test_userinfo_uri",
@@ -49,7 +49,7 @@ def test_authorize_redirect(oidc_client):
         "client_id": oidc_client.client_id,
         "response_type": "code",
         "scope": scope,
-        "redirect_uri": oidc_client.authorize_redirect_uri,
+        "redirect_uri": oidc_client.application_redirect_uri,
         "state": state_token,
     }
     expected_url = URL(oidc_client.authorize_uri)

@@ -7,17 +7,15 @@ from auth_service.lib.logger import logger
 
 @dataclass
 class StateTokenRepository:
-    def __init__(self, user_ip: str):
-        self.user_ip = user_ip
-        self.token = token_urlsafe(24)
-        logger.debug("StateTokenRepository initialized for a user")
 
-    async def get_state_token(self):
+    @staticmethod
+    async def get_state_token(user_ip: str):
         try:
+            state_token = token_urlsafe(24)
             logger.debug("Attempting to save state token")
-            await StateToken.save_token(**self.__dict__)
+            await StateToken.save_token(user_ip, state_token)
             logger.info("State token successfully saved")
-            return self.token
+            return state_token
         except Exception as e:
             logger.error(f"Failed to save state token, error: {str(e)}")
             raise e

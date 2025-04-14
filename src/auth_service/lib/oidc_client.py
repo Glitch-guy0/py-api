@@ -9,7 +9,7 @@ class OIDC_Client[UserDataType]:
     client_id: str
     client_secret: str
     authorize_uri: str
-    authorize_redirect_uri: str
+    application_redirect_uri: str
     scope: set[str]
     token_uri: str
     userinfo_uri: str
@@ -34,7 +34,7 @@ class OIDC_Client[UserDataType]:
             "client_id": self.client_id,
             "response_type": "code",
             "scope": scope,
-            "redirect_uri": self.authorize_redirect_uri,
+            "redirect_uri": self.application_redirect_uri,
             "state": state,
         }
         url = url.copy_merge_params(params)
