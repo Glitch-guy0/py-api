@@ -66,31 +66,43 @@ def test_authorize_redirect(oidc_client):
     ), "redirect url is not equal to expected url"
 
 
-def test_request_access_token(oidc_client, mocker):
+@pytest.mark.asyncio
+async def test_request_access_token(oidc_client, mocker):
     code = "test_code"
     expected_json_data = {"access_token": "some token", "id_token": "someother data"}
     ###
-    # data mock
-    response_data_mock = mocker.Mock()  # think of it as response class
-    response_data_mock.json = expected_json_data  # it contains .json value (dataclass)
+    response_data_mock = mocker.Mock()
+    response_data_mock.json = mocker.AsyncMock(return_value=expected_json_data)
 
-    # (function mock)  .post is an async function so
     async_request_mock = mocker.AsyncMock()
-    async_request_mock.post.return_value = response_data_mock  # when you call `client.get()` it will return the response data
+    async_request_mock.post.return_value = response_data_mock
 
-    # (mock implemented)
+    connection_mock = mocker.AsyncMock()
+    connection_mock.__aenter__.return_value = async_request_mock
+    connection_mock.__aexit__.return_value = None
+
     mocker.patch(
-        "auth_service.lib.oidc_client.AsyncClient", return_value=async_request_mock
-    )  # module is replace with mock
-    response = oidc_client.request_access_token(code)
+        "auth_service.lib.oidc_client.AsyncClient", return_value=connection_mock
+    )
+    response = await oidc_client.request_access_token(code)
     # todo: test for request exception and unauthorized exception
     ###
     async_request_mock.post.assert_called_once_with(
         oidc_client.token_uri,
-        data={"code": code, "grant_type": "authorization_code"},
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        data={
+            "client_id": oidc_client.client_id,
+            "client_secret": oidc_client.client_secret,
+            "code": code,
+            "grant_type": "authorization_code",
+        },
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
+        },
     )
-    assert response == expected_json_data
+    assert (
+        response == expected_json_data["access_token"]
+    ), "response is not equal to expected json data"
 
 
 def test_request_userdata(oidc_client, mocker):
