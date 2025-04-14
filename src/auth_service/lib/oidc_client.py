@@ -5,7 +5,7 @@ from .logger import logger
 
 
 @dataclass
-class OIDC_Client:
+class OIDC_Client[UserDataType]:
     client_id: str
     client_secret: str
     authorize_uri: str
@@ -70,4 +70,23 @@ class OIDC_Client:
         except Exception as e:
             logger.error(f"Error requesting access token: {e}")
             # todo: add http exception
+            raise e
+
+    async def request_userdata(self, access_token: str) -> UserDataType:
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json",
+        }
+        logger.info(f"Requesting user data with access token: {access_token}")
+        try:
+            async with AsyncClient() as client:
+                response = await client.get(self.userinfo_uri, headers=headers)
+                json_data: UserDataType = await response.json()
+                logger.debug(f"User data received: {json_data}")
+                return json_data
+        except TimeoutException as e:
+            logger.error(f"Timeout error requesting user data: {e}")
+            raise e
+        except Exception as e:
+            logger.error(f"Error requesting user data: {e}")
             raise e
