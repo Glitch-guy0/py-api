@@ -11,7 +11,10 @@ okta_client: OIDC_Client = OIDC_Client(
     client_secret=config.okta_client_secret,
     authorize_uri=config.okta_authorize_uri,
     application_redirect_uri=config.okta_application_redirect_uri,
-    scope=set(["openid email"]),
+    scope=set(
+        ["openid", "email", "profile", "address", "phone", "offline_access", "groups"]
+    ),
+    default_scope=["openid", "email", "profile"],
     token_uri=config.okta_token_uri,
     userinfo_uri=config.okta_userinfo_uri,
     jwks_uri=config.okta_jwks_uri,
@@ -19,11 +22,13 @@ okta_client: OIDC_Client = OIDC_Client(
 
 
 @router.get("/oauth/v2/login")
-async def user_login(request: Request) -> RedirectResponse:
+async def user_login(request: Request, scope: str = None) -> RedirectResponse:
     if not request.client:
         raise HTTPException(status_code=400, detail="Client not found")
     state_token = await StateTokenRepository.get_state_token(request.client.host)
-    return okta_client.authorization_redirect("openid email", state_token)
+    return okta_client.authorization_redirect(
+        state_token, scope.split(" ") if scope else []
+    )
 
 
 @router.get("/oauth/v2/callback")
