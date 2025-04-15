@@ -3,6 +3,8 @@ import pytest
 from auth_service.lib.oidc_client import OIDC_Client
 from urllib.parse import urlparse, parse_qs
 
+from shared_lib.exception import ApplicationError
+
 data = {
     "client_id": "test_client_id",
     "client_secret": "test_client_secret",
@@ -133,7 +135,6 @@ async def test_request_access_token(oidc_client, mocker):
         "auth_service.lib.oidc_client.AsyncClient", return_value=connection_mock
     )
     response = await oidc_client.request_access_token(code)
-    # todo: test for request exception and unauthorized exception
     ###
     async_request_mock.post.assert_called_once_with(
         oidc_client.token_uri,
@@ -152,6 +153,14 @@ async def test_request_access_token(oidc_client, mocker):
     assert (
         response == expected_json_data["access_token"]
     ), "response is not equal to expected json data"
+
+
+@pytest.mark.asyncio
+async def test_request_access_token_invalid_code(oidc_client, mocker):
+    code = "invalid_code"
+    ###
+    with pytest.raises(ApplicationError):
+        await oidc_client.request_access_token(code)
 
 
 @pytest.mark.asyncio
