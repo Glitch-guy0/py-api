@@ -18,7 +18,7 @@ okta_client: OIDC_Client = OIDC_Client(
 )
 
 
-@router.get("/login")
+@router.get("/oauth/v2/login")
 async def user_login(request: Request) -> RedirectResponse:
     if not request.client:
         raise HTTPException(status_code=400, detail="Client not found")
@@ -26,7 +26,7 @@ async def user_login(request: Request) -> RedirectResponse:
     return okta_client.authorization_redirect("openid email", state_token)
 
 
-@router.get("/callback")
+@router.get("/oauth/v2/callback")
 async def user_callback(request: Request, code: str, state: str):
     if not request.client:
         raise HTTPException(status_code=400, detail="Client not found")
