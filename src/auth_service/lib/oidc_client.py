@@ -11,21 +11,25 @@ class OIDC_Client[UserDataType]:
     authorize_uri: str
     application_redirect_uri: str
     scope: set[str]
+    default_scope: list[str]
     token_uri: str
     userinfo_uri: str
     jwks_uri: str
 
-    def authorization_redirect(self, scope: str, state: str) -> RedirectResponse:
+    def authorization_redirect(
+        self, state: str, additional_scope: list[str] = []
+    ) -> RedirectResponse:
         logger.debug("Starting authentication redirect process.")
-
-        if scope not in self.scope:
-            logger.error(
-                f"Invalid scope '{scope}' provided. Allowed scopes are: {', '.join(self.scope)}"
-            )
-            raise ValueError(
-                f"Invalid scope '{scope}' provided. Allowed scopes are: {', '.join(self.scope)}"
-            )
-
+        scope_list = set(self.default_scope + additional_scope)
+        for scope in scope_list:
+            if scope not in self.scope:
+                logger.error(
+                    f"Invalid scope '{scope}' provided. Allowed scopes are: {', '.join(self.scope)}"
+                )
+                raise ValueError(
+                    f"Invalid scope '{scope}' provided. Allowed scopes are: {', '.join(self.scope)}"
+                )
+        scope = " ".join(scope_list)
         logger.info(
             f"Generating authentication redirect URL for scope: {scope} and state: {state}."
         )
