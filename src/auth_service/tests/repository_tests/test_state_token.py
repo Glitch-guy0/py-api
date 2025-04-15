@@ -7,6 +7,7 @@ from auth_service.repository.state_token import StateTokenRepository
 async def test_get_state_token(mocker):
     user_ip = "127.0.0.1"
     ###
+    # todo: this should be async mock
     db_call = mocker.patch(
         "auth_service.models.state_token.StateToken.save_token", return_value=None
     )

@@ -9,6 +9,7 @@ data = {
     "authorize_uri": "test_redirect_uri",
     "application_redirect_uri": "test_application_redirect_uri",
     "scope": set(["email", "profile"]),
+    "default_scope": ["email"],
     "token_uri": "test_token_uri",
     "userinfo_uri": "test_userinfo_uri",
     "jwks_uri": "test_jwks_uri",
@@ -42,13 +43,34 @@ def oidc_client():
     return client
 
 
-def test_authorize_redirect(oidc_client):
+def test_authorize_redirect_default_scope(oidc_client):
     state_token = "sample_token"
-    scope = "email"
     expected_params = {
         "client_id": oidc_client.client_id,
         "response_type": "code",
-        "scope": scope,
+        "scope": " ".join(oidc_client.default_scope),
+        "redirect_uri": oidc_client.application_redirect_uri,
+        "state": state_token,
+    }
+    expected_url = URL(oidc_client.authorize_uri)
+    expected_url = expected_url.copy_merge_params(expected_params)
+    ###
+    redirect_url_string = oidc_client.authorization_redirect(state=state_token)
+    redirect_url = redirect_url_string.headers["Location"]
+    ###
+    assert redirect_url is not None
+    assert compare_urls(
+        str(expected_url), str(redirect_url)
+    ), "redirect url is not equal to expected url"
+
+
+def test_authorize_redirect_custom_scope(oidc_client):
+    state_token = "sample_token"
+    additional_scope = ["profile"]
+    expected_params = {
+        "client_id": oidc_client.client_id,
+        "response_type": "code",
+        "scope": " ".join(oidc_client.default_scope + additional_scope),
         "redirect_uri": oidc_client.application_redirect_uri,
         "state": state_token,
     }
@@ -56,7 +78,7 @@ def test_authorize_redirect(oidc_client):
     expected_url = expected_url.copy_merge_params(expected_params)
     ###
     redirect_url_string = oidc_client.authorization_redirect(
-        scope=scope, state=state_token
+        state=state_token, additional_scope=additional_scope
     )
     redirect_url = redirect_url_string.headers["Location"]
     ###
@@ -64,6 +86,16 @@ def test_authorize_redirect(oidc_client):
     assert compare_urls(
         str(expected_url), str(redirect_url)
     ), "redirect url is not equal to expected url"
+
+
+def test_authorize_redirect_unknown_scope(oidc_client):
+    state_token = "sample_token"
+    additional_scope = ["unknown_scope"]
+    ###
+    with pytest.raises(ValueError):
+        oidc_client.authorization_redirect(
+            state=state_token, additional_scope=additional_scope
+        )
 
 
 @pytest.mark.asyncio

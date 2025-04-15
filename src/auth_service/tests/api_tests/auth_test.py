@@ -40,6 +40,7 @@ async def test_login_route():
 
 @pytest.mark.asyncio
 async def test_auth_callback_route():
+    # todo: need to mock repository call
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
