@@ -6,7 +6,9 @@ from typing import Optional
 
 
 class System_Environment(BaseSettings):
-    model_config = SettingsConfigDict(env_file=find_dotenv(raise_error_if_not_found=True))
+    model_config = SettingsConfigDict(
+        env_file=find_dotenv(raise_error_if_not_found=True)
+    )
 
     service_name: str = Field("auth_service", validation_alias="SERVICE_NAME")
 

@@ -16,7 +16,7 @@ class StateToken(Document):
         cls_object = cls(
             user_ip=user_ip,
             state_token=state_token,
-            created_at=int(datetime.datetime.now().timestamp()),
+            created_at=datetime.datetime.now().timestamp(),
         )
         try:
             await cls_object.save()
