@@ -44,7 +44,7 @@ class OIDC_Client[UserDataType]:
         }
         url = url.copy_merge_params(params)
         logger.debug(f"Redirect URL generated: {url}")
-        return RedirectResponse(url=str(url))
+        return RedirectResponse(url=str(url), status_code=302)
 
     async def request_access_token(self, code: str) -> str:
         params = {
