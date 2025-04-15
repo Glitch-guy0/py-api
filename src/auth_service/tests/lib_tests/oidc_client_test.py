@@ -17,11 +17,11 @@ data = {
 
 
 def compare_urls(url1: str, url2: str) -> bool:
-    # Parse both URLs
+    # Step 1: Parse both URLs
     parsed1 = urlparse(url1)
     parsed2 = urlparse(url2)
 
-    # Compare scheme, hostname, path (ignore params for now)
+    # Step 2: Compare scheme, host, path
     if (
         parsed1.scheme != parsed2.scheme
         or parsed1.netloc != parsed2.netloc
@@ -29,12 +29,28 @@ def compare_urls(url1: str, url2: str) -> bool:
     ):
         return False
 
-    # Parse query strings into dicts
+    # Step 3: Parse query strings into dicts
     query1 = parse_qs(parsed1.query)
     query2 = parse_qs(parsed2.query)
 
-    # Return True only if all keys and values match
-    return query1 == query2
+    # Step 4: Early exit if keys mismatch
+    if query1.keys() != query2.keys():
+        return False
+
+    # Step 5: Compare values
+    for key in query1:
+        vals1 = query1[key]
+        vals2 = query2[key]
+        if key == "scope":
+            # Order doesn't matter for scope
+            if sorted(vals1[0].split()) != sorted(vals2[0].split()):
+                return False
+        else:
+            # Order *does* matter for other keys
+            if vals1 != vals2:
+                return False
+
+    return True
 
 
 @pytest.fixture
