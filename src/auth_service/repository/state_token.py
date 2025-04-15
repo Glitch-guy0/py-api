@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 from secrets import token_urlsafe
-from fastapi import HTTPException
 from auth_service.models.state_token import StateToken
 from auth_service.lib.logger import logger
+from shared_lib.exception import ApplicationError
 
 
 @dataclass
 class StateTokenRepository:
-
     @staticmethod
     async def get_state_token(user_ip: str):
         try:
@@ -27,8 +26,8 @@ class StateTokenRepository:
             token = await StateToken.get_token(user_ip)
             if token != state_token:
                 logger.warning("Unauthorized access attempt with invalid state token")
-                raise HTTPException(
-                    status_code=401, detail="Unauthorized: Invalid state token"
+                raise ApplicationError(
+                    "Unauthorized: Invalid state token", status_code=401
                 )
             logger.info("State token verified successfully")
         except Exception as e:

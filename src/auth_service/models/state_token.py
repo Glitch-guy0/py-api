@@ -2,8 +2,7 @@ from beanie import Document, Indexed
 from beanie.exceptions import DocumentAlreadyCreated
 from typing import Annotated
 import datetime
-
-from fastapi import HTTPException
+from shared_lib.exception import ApplicationError
 
 
 class StateToken(Document):
@@ -28,6 +27,6 @@ class StateToken(Document):
     async def get_token(user_ip: str) -> str:
         token = await StateToken.find_one(StateToken.user_ip == user_ip)
         if not token:
-            raise HTTPException(status_code=401, detail="Unauthorized: Token not found")
+            raise ApplicationError("Unauthorized: Token not found", status_code=401)
 
         return token.state_token
