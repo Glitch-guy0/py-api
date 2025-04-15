@@ -13,6 +13,6 @@ class ApplicationError(HTTPException):
     request_id: (Optional) If using tracing/logs — helps match logs with errors.
     """
 
-    def __init__(self, detail: str, status: int):
+    def __init__(self, detail: str, status_code: int):
         error_message = {"error": {"detail": detail}}
-        super().__init__(status_code=status, detail=error_message)
+        super().__init__(status_code=status_code, detail=error_message)

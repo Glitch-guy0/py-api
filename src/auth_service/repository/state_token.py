@@ -26,9 +26,7 @@ class StateTokenRepository:
             token = await StateToken.get_token(user_ip)
             if token != state_token:
                 logger.warning("Unauthorized access attempt with invalid state token")
-                raise ApplicationError(
-                    "Unauthorized: Invalid state token", status_code=401
-                )
+                raise ApplicationError("Unauthorized: Invalid state token", 401)
             logger.info("State token verified successfully")
         except Exception as e:
             logger.error(f"Error verifying state token, error: {str(e)}")

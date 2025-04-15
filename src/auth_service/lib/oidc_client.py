@@ -4,6 +4,7 @@ from httpx import URL, AsyncClient, TimeoutException
 from .logger import logger
 from shared_lib.exception import ApplicationError
 
+
 @dataclass
 class OIDC_Client[UserDataType]:
     client_id: str

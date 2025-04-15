@@ -7,7 +7,6 @@ from shared_lib.exception import ApplicationError
 async def test_get_state_token(mocker):
     user_ip = "127.0.0.1"
     ###
-    # todo: this should be async mock
     db_call = mocker.patch(
         "auth_service.models.state_token.StateToken.save_token", return_value=None
     )
@@ -15,7 +14,7 @@ async def test_get_state_token(mocker):
     ###
     assert token is not None
     assert len(token) == 32
-    db_call.assert_called_once_with(user_ip=user_ip, token=token)
+    db_call.assert_called_once_with(user_ip, token)
 
 
 @pytest.mark.asyncio
