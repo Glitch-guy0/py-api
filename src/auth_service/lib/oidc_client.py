@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from starlette.responses import RedirectResponse
 from httpx import URL, AsyncClient, TimeoutException
 from .logger import logger
-
+from shared_lib.exception import ApplicationError
 
 @dataclass
 class OIDC_Client[UserDataType]:
@@ -66,16 +66,13 @@ class OIDC_Client[UserDataType]:
                 return json_data["access_token"]
         except TimeoutException as e:
             logger.error(f"Timeout error requesting access token: {e}")
-            # todo: add http exception
-            raise e
+            raise ApplicationError("Timeout error requesting access token", 504)
         except KeyError as e:
             logger.error(f"Key error access token not found!: {e}")
-            # todo: add http exception
-            raise e
+            raise ApplicationError("Key error access token not found!", 500)
         except Exception as e:
             logger.error(f"Error requesting access token: {e}")
-            # todo: add http exception
-            raise e
+            raise ApplicationError("Error requesting access token", 500)
 
     async def request_userdata(self, access_token: str) -> UserDataType:
         headers = {
