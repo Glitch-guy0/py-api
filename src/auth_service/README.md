@@ -1,24 +1,54 @@
 # Auth Service
 
-This microservice is responsible for user authentication. It is built using FastAPI and follows a modular structure to ensure scalability and maintainability.
+This microservice handles user authentication using FastAPI and Okta OIDC integration. It follows a modular architecture for scalability and maintainability.
 
 ## Project Structure
 
-The project is organized as follows:
+#### api/
+- Contains all API endpoint routes
+- Handles HTTP requests and responses
+- Defines route handlers and middleware
+- Key files:
+  - `auth.py`: OAuth2/OIDC authentication routes
+    - `user_login()`: OAuth2 login endpoint
+    - `user_callback()`: OAuth2 callback endpoint
 
-- **api**: This folder contains all the API endpoints. If you plan to add WebSocket support in the future, create a new folder called `sockets` within this directory.
-- **lib**: This folder contains all the utility classes and helper functions used across the service.
-- **interface**: This folder is designated for creating interface files. These interfaces define the contracts for various components and ensure consistent implementation across the service.
-- **models**: This folder contains all the database models. These models are used to interact with the database.
-- **repositories**: This folder contains all the abstract classes and interfaces for database operations.
-- **tests**: This folder contains all the test cases. It follows the same directory structure as the service to ensure easy navigation and organization.
+#### lib/
+- Contains core business logic and utility classes
+- Implements authentication flows and token handling
+- Key files:
+  - `oidc_client.py`: OIDC authentication implementation
+    - OAuth2/OIDC flow management
+    - Token and user data handling
 
----
+#### models/
+- Contains database schema definitions
+- Defines data structures and relationships
+- Key files:
+  - `state_token.py`: State token schema
 
-- **config**: This folder is responsible for loading all environment variables from the `.env` file.
-- **main.py**: This is the main executable file that starts the FastAPI application.
+#### repositories/
+- Database access layer abstraction
+- Implements CRUD operations
+- Key files:
+  - `state_token.py`: State token database operations
+    - Token storage and retrieval
+    - Token validation
 
+#### tests/
+- Test suite implementation
+- Unit and integration tests
+- Test utilities and fixtures
 
+#### config/
+- Environment configuration management
+- Configuration loading and validation
+- Environment variable handling
 
+### Root Files
 
-
+#### main.py
+- Application bootstrap
+- FastAPI app initialization
+- Route registration
+- Middleware setup
