@@ -22,7 +22,7 @@ okta_client: OIDC_Client = OIDC_Client(
 )
 
 
-@router.get("/oauth/v2/login")
+@router.get("/oauth/v2/okta/login")
 async def user_login(request: Request, scope: str = None) -> RedirectResponse:
     if not request.client:
         raise ApplicationError("Client not found", 400)
@@ -32,7 +32,7 @@ async def user_login(request: Request, scope: str = None) -> RedirectResponse:
     )
 
 
-@router.get("/oauth/v2/callback")
+@router.get("/oauth/v2/okta/callback")
 async def user_callback(request: Request, code: str, state: str):
     if not request.client:
         raise ApplicationError("Client not found", 400)

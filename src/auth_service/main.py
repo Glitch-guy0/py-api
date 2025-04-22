@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from auth_service.api.auth import router as auth_router
+from auth_service.api.okta_api import router as auth_router
 from auth_service.lib.init_db import init_db
 from auth_service.lib.logger import logger
 
