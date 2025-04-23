@@ -1,19 +1,20 @@
 from fastapi import FastAPI
 from auth_service.api.okta_api import router as auth_router
-from auth_service.lib.init_db import init_db
+from shared_lib.database.init_mongodb import init_db
 from auth_service.lib.logger import logger
+from auth_service.config import Config
 
 
-async def lifespan(app: FastAPI):
-    logger.info("Initializing database ...")
-    print("Initializing database ...")
+async def initialize_server(app: FastAPI):
+    logger.info(f"Initializing {Config.service_name} ...")
+    logger.info("Initiating MongoDB ...")
     await init_db()
-    logger.info("Database initialized")
-    print("Database initialized")
+    logger.info("MongoDB OK")
     yield
+    logger.info(f"Shutting down {Config.service_name} ...")
 
 
-app = FastAPI(lifespan=lifespan)  # type: ignore
+app = FastAPI(lifespan=initialize_server)  # type: ignore
 
 app.include_router(auth_router)
 
