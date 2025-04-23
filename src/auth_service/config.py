@@ -1,4 +1,4 @@
-from pydantic import ValidationError, Field, AliasChoices
+from pydantic import ValidationError, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import find_dotenv
 import sys
@@ -31,6 +31,8 @@ class System_Environment(BaseSettings):
     okta_token_uri: str = Field(..., validation_alias="OKTA_TOKEN_URI")
     okta_userinfo_uri: str = Field(..., validation_alias="OKTA_USERINFO_URI")
     okta_jwks_uri: str = Field(..., validation_alias="OKTA_JWKS_URI")
+    okta_scope: str = Field(..., validation_alias="OKTA_SCOPE")
+    okta_logout_uri: str = Field(..., validation_alias="OKTA_LOGOUT_URI")
 
     # mongo config
     mongo_uri: str = Field(..., validation_alias="MONGO_URI")
@@ -39,7 +41,7 @@ class System_Environment(BaseSettings):
 
 
 try:
-    config = System_Environment()  # type: ignore
+    Config = System_Environment()  # type: ignore
 except ValidationError as e:
     error = e.errors()[0]
     err_message = (

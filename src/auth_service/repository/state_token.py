@@ -16,7 +16,7 @@ class StateTokenRepository:
             logger.info("State token successfully saved")
             return state_token
         except Exception as e:
-            logger.error(f"Failed to save state token, error: {str(e)}")
+            logger.error(f"Failed to save state token")
             raise e
 
     @staticmethod
@@ -29,5 +29,7 @@ class StateTokenRepository:
                 raise ApplicationError("Unauthorized: Invalid state token", 401)
             logger.info("State token verified successfully")
         except Exception as e:
-            logger.error(f"Error verifying state token, error: {str(e)}")
+            if isinstance(e, ApplicationError):
+                raise e
+            logger.error(f"Error verifying state token")
             raise e

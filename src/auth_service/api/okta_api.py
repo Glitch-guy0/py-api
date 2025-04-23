@@ -1,42 +1,34 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 from starlette.responses import RedirectResponse
-from auth_service.lib.oidc_client import OIDC_Client
-from auth_service.config import config
-from auth_service.repository.state_token import StateTokenRepository
 from shared_lib.exception import ApplicationError
+from auth_service.lib.oidc.client.okta import Okta_Client, Auth_Tokens
 
-router = APIRouter()
 
-okta_client: OIDC_Client = OIDC_Client(
-    client_id=config.okta_client_id,
-    client_secret=config.okta_client_secret,
-    authorize_uri=config.okta_authorize_uri,
-    application_redirect_uri=config.okta_application_redirect_uri,
-    scope=set(
-        ["openid", "email", "profile", "address", "phone", "offline_access", "groups"]
-    ),
-    default_scope=["openid", "email", "profile"],
-    token_uri=config.okta_token_uri,
-    userinfo_uri=config.okta_userinfo_uri,
-    jwks_uri=config.okta_jwks_uri,
+router = APIRouter(
+    prefix="/oauth/v2/okta",
+    tags=["okta"],
 )
 
+okta_client = Okta_Client()
 
-@router.get("/oauth/v2/okta/login")
-async def user_login(request: Request, scope: str = None) -> RedirectResponse:
+@router.get("/login")
+async def user_login(request: Request) -> RedirectResponse:
     if not request.client:
         raise ApplicationError("Client not found", 400)
-    state_token = await StateTokenRepository.get_state_token(request.client.host)
-    return okta_client.authorization_redirect(
-        state_token, scope.split(" ") if scope else []
-    )
+    return await okta_client.authenticaton_redirect(user_ip=request.client.host)
 
 
-@router.get("/oauth/v2/okta/callback")
-async def user_callback(request: Request, code: str, state: str):
+@router.get("/callback")
+async def user_callback(request: Request,response: Response, code: str, state: str):
     if not request.client:
         raise ApplicationError("Client not found", 400)
-    await StateTokenRepository.verify_state_token(request.client.host, state)
-    access_token = await okta_client.request_access_token(code)
-    user_data = await okta_client.request_userdata(access_token)
-    return user_data
+    tokens: Auth_Tokens =  await okta_client.authenticaton_callback_handler(code=code, state=state, user_ip=request.client.host)
+    print(tokens)
+    response.headers["Authorization"] = f"Bearer {tokens.access_token}"
+    response.headers['id_token'] = tokens.id_token
+    return response
+
+
+@router.get("/logout")
+async def user_logout(request: Request):
+    return await okta_client.logout()

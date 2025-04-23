@@ -2,13 +2,13 @@ import os
 import logging
 import logging.handlers
 from pythonjsonlogger import jsonlogger
-from auth_service.config import config
+from auth_service.config import Config
 
 # Define the log file path and rotation settings
-LOG_FILE_PATH: str = config.log_file_path  # type: ignore
-LOG_MAX_BYTES: int = config.log_max_bytes  # type: ignore
-LOG_BACKUP_COUNT: int = config.log_backup_count  # type: ignore
-SERVICE_NAME: str = config.service_name  # type: ignore
+LOG_FILE_PATH: str = Config.log_file_path  # type: ignore
+LOG_MAX_BYTES: int = Config.log_max_bytes  # type: ignore
+LOG_BACKUP_COUNT: int = Config.log_backup_count  # type: ignore
+SERVICE_NAME: str = Config.service_name  # type: ignore
 
 
 # Create folder and file for log file path if not exists

@@ -1,6 +1,10 @@
 from fastapi import HTTPException
 
 
+def error_structure(status_code: int, detail: str):
+    return {"error": {"status_code": status_code, "message": detail}}
+
+
 class ApplicationError(HTTPException):
     """
     Base class for all application exceptions.
@@ -10,5 +14,6 @@ class ApplicationError(HTTPException):
     """
 
     def __init__(self, detail: str, status_code: int):
-        error_message = {"error": {"detail": detail}}
-        super().__init__(status_code=status_code, detail=error_message)
+        super().__init__(
+            status_code=status_code, detail=error_structure(status_code, detail)
+        )
