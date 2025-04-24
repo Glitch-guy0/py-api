@@ -1,20 +1,17 @@
-from beanie import init_beanie
-from auth_service.models.state_token import StateToken
+from beanie import init_beanie, Document
 from motor.motor_asyncio import AsyncIOMotorClient
-from auth_service.config import Config
+from shared_lib.exception import ApplicationError
 
 
-motor_client: AsyncIOMotorClient = AsyncIOMotorClient(
-    Config.mongo_uri, Config.mongo_port, serverSelectionTimeoutMS=3000
-)
-
-
-async def init_db():
+       
+async def init_mongo_db(mongo_uri: str, mongo_port: int, database_name: str, models: list[Document]):
     try:
-        await init_beanie(
-            motor_client.get_database(Config.mongo_db_name),
-            document_models=[StateToken],
+        motor_client: AsyncIOMotorClient = AsyncIOMotorClient(
+            mongo_uri, mongo_port, serverSelectionTimeoutMS=3000
         )
+        await init_beanie(
+                motor_client.get_database(database_name),
+                document_models=models,
+            ) 
     except Exception as e:
-        print(f"Error initializing database: {e}, is the database running?")
-        raise e
+        raise ApplicationError(f"Failed to connect to Monogo DB: {e}", status_code=500)
