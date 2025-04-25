@@ -13,7 +13,12 @@ class Auth_Tokens(BaseModel):
     class Config:
         extra = "ignore"
 
-    
+
+@dataclass
+class AuthenticationState:
+    session_key: str
+    state_token: str
+    redirect_uri: str
 
 
 @dataclass
@@ -29,13 +34,13 @@ class OIDC_Client(ABC):
     logout_uri: str
 
     @abstractmethod
-    async def authenticaton_redirect(self, user_ip: str) -> RedirectResponse:
+    async def authenticaton_redirect(self) -> RedirectResponse:
         """Redirect to the OIDC provider for authentication"""
         pass
 
     @abstractmethod
     async def authenticaton_callback_handler(
-        self, code: str, state: str, user_ip: str
+        self, code: str, state: str, session_key: str
     ) -> Auth_Tokens:
         """Handle OIDC callback and return auth tokens"""
         pass
