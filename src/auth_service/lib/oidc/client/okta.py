@@ -1,34 +1,44 @@
+from auth_service.lib import session_key_generator, state_token_generator
 from auth_service.lib.oidc.interface import Auth_Tokens
 from auth_service.lib.oidc.interface import OIDC_Client
 from fastapi.responses import RedirectResponse
-from auth_service.repository.state_token import StateTokenRepository
 from httpx import URL, AsyncClient, HTTPStatusError
 from auth_service.config import Config
 from shared_lib.exception import ApplicationError
+from auth_service.repository.auth_state import AuthStateRepository, AuthenticationState
 
 
 class Okta_Client(OIDC_Client):
     def __init__(self):
         super().__init__(
-            client_id = Config.okta_client_id,
-            client_secret = Config.okta_client_secret,
-            authorize_uri = Config.okta_authorize_uri,
-            application_redirect_uri = Config.okta_application_redirect_uri,
-            scope = Config.okta_scope,
-            token_uri = Config.okta_token_uri,
-            userinfo_uri = Config.okta_userinfo_uri,
-            jwks_uri = Config.okta_jwks_uri,
-            logout_uri = Config.okta_logout_uri
+            client_id=Config.okta_client_id,
+            client_secret=Config.okta_client_secret,
+            authorize_uri=Config.okta_authorize_uri,
+            application_redirect_uri=Config.okta_application_redirect_uri,
+            scope=Config.okta_scope,
+            token_uri=Config.okta_token_uri,
+            userinfo_uri=Config.okta_userinfo_uri,
+            jwks_uri=Config.okta_jwks_uri,
+            logout_uri=Config.okta_logout_uri,
         )
 
-    async def authenticaton_redirect(self, user_ip: str) -> RedirectResponse:
-
+    async def authenticaton_redirect(self) -> RedirectResponse:
+        state_token = state_token_generator()
+        session_key = session_key_generator()
+        redirect_uri = URL(self.application_redirect_uri)
+        redirect_uri.params["session_key"] = session_key
+        auth_state = AuthenticationState(
+            session_key=session_key,
+            state_token=state_token,
+            redirect_uri=redirect_uri,
+        )
+        await AuthStateRepository.save_auth_state(auth_state)
         params = {
             "client_id": self.client_id,
-            "redirect_uri": self.application_redirect_uri,
+            "redirect_uri": redirect_uri,
             "response_type": "code",
             "scope": self.scope,
-            "state": await StateTokenRepository.get_state_token(user_ip),
+            "state": state_token,
         }
 
         redirect_url = URL(self.authorize_uri)
@@ -37,7 +47,7 @@ class Okta_Client(OIDC_Client):
     async def authenticaton_callback_handler(
         self, code: str, state: str, user_ip: str
     ) -> Auth_Tokens:
-        await StateTokenRepository.verify_state_token(user_ip, state)
+        await AuthStateRepository.verify_state_token(user_ip, state)
 
         params = {
             "client_id": self.client_id,
@@ -52,8 +62,10 @@ class Okta_Client(OIDC_Client):
             try:
                 response.raise_for_status()
             except HTTPStatusError as e:
-                raise ApplicationError(f"Failed to exchange code for tokens {response.text}", 500)
-            
+                raise ApplicationError(
+                    f"Failed to exchange code for tokens {response.text}", 500
+                )
+
             tokens = Auth_Tokens(**response.json())
             return tokens
 
@@ -62,7 +74,9 @@ class Okta_Client(OIDC_Client):
 
     async def get_userclaims(self, access_token: str) -> dict:
         async with AsyncClient() as client:
-            response = await client.get(self.userinfo_uri, headers={"Authorization": f"Bearer {access_token}"})
+            response = await client.get(
+                self.userinfo_uri, headers={"Authorization": f"Bearer {access_token}"}
+            )
             try:
                 response.raise_for_status()
             except HTTPStatusError as e:

@@ -6,7 +6,7 @@ import time
 
 
 @dataclass
-class Auth_State_Repository:
+class AuthStateRepository:
     @staticmethod
     async def save_auth_state(auth_state: AuthenticationState) -> None:
         start_time = time.monotonic()
