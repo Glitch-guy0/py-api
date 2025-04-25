@@ -25,7 +25,7 @@ class DBInitializer:
 
         def cleanup(logger: JSONLogger):
             logger.debug(
-                message="Cleaning up logger",
+                message="Cleaning up mongo db initialization logger",
                 context={},
             )
             del logger
@@ -42,6 +42,7 @@ class DBInitializer:
                     document_models=models,
                 )
                 cleanup(logger)
+                return
             except ValueError as e:
                 cleanup(logger)
                 raise ApplicationError(
