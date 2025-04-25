@@ -32,7 +32,7 @@ class Okta_Client(OIDC_Client):
 
         ServiceLog.debug(
             "Generated auth parameters",
-            extra={
+            context={
                 "session_key": session_key,
                 "state_token": state_token,
                 "redirect_uri": redirect_uri,
@@ -47,7 +47,11 @@ class Okta_Client(OIDC_Client):
         await AuthStateRepository.save_auth_state(auth_state)
         ServiceLog.info(
             "Authentication redirect initiated",
-            extra={"session_key": session_key, "state_token": state_token},
+            context={
+                "session_key": session_key,
+                "state_token": state_token,
+                "redirect_uri": redirect_uri,
+            },
         )
 
         params = {
@@ -61,16 +65,26 @@ class Okta_Client(OIDC_Client):
         redirect_url = URL(self.authorize_uri)
         ServiceLog.debug(
             "Redirect URL generated",
-            extra={"redirect_url": str(redirect_url.copy_merge_params(params))},
+            context={
+                "redirect_url": str(redirect_url.copy_merge_params(params)),
+                "session_key": session_key,
+                "state_token": state_token,
+                "redirect_uri": redirect_uri,
+            },
         )
-        return RedirectResponse(url=str(redirect_url.copy_merge_params(params)))
+        return RedirectResponse(
+            url=str(redirect_url.copy_merge_params(params)), status_code=302
+        )
 
     async def authenticaton_callback_handler(
         self, code: str, state: str, session_key: str
     ) -> Auth_Tokens:
         ServiceLog.debug(
             "Processing authentication callback",
-            extra={"session_key": session_key, "state": state},
+            context={
+                "session_key": session_key,
+                "state": state,
+            },
         )
 
         auth_state: AuthenticationState = await AuthStateRepository.get_auth_state(
@@ -79,7 +93,7 @@ class Okta_Client(OIDC_Client):
         if auth_state.state_token != state:
             ServiceLog.warning(
                 "Invalid state token received",
-                extra={
+                context={
                     "session_key": session_key,
                     "received_state": state,
                     "expected_state": auth_state.state_token,
@@ -97,7 +111,10 @@ class Okta_Client(OIDC_Client):
 
         ServiceLog.debug(
             "Attempting to exchange code for tokens",
-            extra={"session_key": session_key, "token_uri": self.token_uri},
+            context={
+                "session_key": session_key,
+                "token_uri": self.token_uri,
+            },
         )
 
         async with AsyncClient() as client:
@@ -107,7 +124,10 @@ class Okta_Client(OIDC_Client):
             except HTTPStatusError:
                 ServiceLog.error(
                     "Failed to exchange code for tokens",
-                    extra={"session_key": session_key, "error_response": response.text},
+                    context={
+                        "session_key": session_key,
+                        "error_response": response.text,
+                    },
                 )
                 raise ApplicationError(
                     f"Failed to exchange code for tokens {response.text}", 500
@@ -115,7 +135,8 @@ class Okta_Client(OIDC_Client):
 
             tokens = Auth_Tokens(**response.json())
             ServiceLog.info(
-                "Successfully obtained auth tokens", extra={"session_key": session_key}
+                "Successfully obtained auth tokens",
+                context={"session_key": session_key},
             )
             return tokens
 
@@ -133,7 +154,10 @@ class Okta_Client(OIDC_Client):
             try:
                 response.raise_for_status()
             except HTTPStatusError as e:
-                ServiceLog.error("Failed to get user claims", extra={"error": str(e)})
+                ServiceLog.error(
+                    "Failed to get user claims",
+                    context={"error": str(e)},
+                )
                 raise ApplicationError(f"Unauthorized to access userinfo", 401)
             ServiceLog.info("Successfully retrieved user claims")
             return response.json()

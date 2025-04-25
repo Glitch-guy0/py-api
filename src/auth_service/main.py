@@ -1,10 +1,10 @@
 import sys
 from fastapi import FastAPI
 
-# from auth_service.api.okta_api import router as auth_router
 from auth_service.config import Config
 from shared_lib.database import DBInitializer
 from auth_service.models import models
+from auth_service.api.okta_api import router as auth_router
 
 
 async def initialize_server(app: FastAPI):
@@ -23,7 +23,7 @@ async def initialize_server(app: FastAPI):
 
 app = FastAPI(lifespan=initialize_server)
 
-# app.include_router(auth_router)
+app.include_router(auth_router)
 
 
 # test endpoint
