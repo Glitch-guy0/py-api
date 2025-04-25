@@ -25,12 +25,10 @@ class Okta_Client(OIDC_Client):
     async def authenticaton_redirect(self) -> RedirectResponse:
         state_token = state_token_generator()
         session_key = session_key_generator()
-        redirect_uri = URL(self.application_redirect_uri)
-        redirect_uri.params["session_key"] = session_key
         auth_state = AuthenticationState(
             session_key=session_key,
             state_token=state_token,
-            redirect_uri=redirect_uri,
+            redirect_uri=f"{self.application_redirect_uri}/{session_key}",
         )
         await AuthStateRepository.save_auth_state(auth_state)
         params = {
