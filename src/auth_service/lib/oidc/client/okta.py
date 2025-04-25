@@ -42,7 +42,7 @@ class Okta_Client(OIDC_Client):
         }
 
         redirect_url = URL(self.authorize_uri)
-        return RedirectResponse(url=redirect_url.copy_merge_params(params))
+        return RedirectResponse(url=str(redirect_url.copy_merge_params(params)))
 
     async def authenticaton_callback_handler(
         self, code: str, state: str, user_ip: str

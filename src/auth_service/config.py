@@ -13,13 +13,13 @@ class System_Environment(BaseSettings):
     service_name: str = Field("auth_service", validation_alias="SERVICE_NAME")
 
     # logging config
-    log_file_path: Optional[str] = Field(
+    log_file_path: str = Field(
         "logs/auth_service.log", validation_alias="LOG_FILE_PATH"
     )
-    log_max_bytes: Optional[int] = Field(
+    log_max_bytes: int = Field(
         5 * 1024 * 1024, validation_alias="LOG_MAX_BYTES"
     )  # 5 MB
-    log_backup_count: Optional[int] = Field(3, validation_alias="LOG_BACKUP_COUNT")
+    log_backup_count: int = Field(3, validation_alias="LOG_BACKUP_COUNT")
 
     # okta config
     okta_authorize_uri: str = Field(..., validation_alias="OKTA_AUTHORIZE_URI")
