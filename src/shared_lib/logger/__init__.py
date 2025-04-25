@@ -61,24 +61,29 @@ class JSONLogger(Logger_protocol):
     def debug(
         self, message: str, trace_id: str | None = None, context: dict[str, Any] = {}
     ) -> None:
-        self.logger.debug(message, trace_id, context)
+        extra_data = {"trace_id": trace_id, "context": context}
+        self.logger.debug(message, extra=extra_data)
 
     def info(
         self, message: str, trace_id: str | None = None, context: dict[str, Any] = {}
     ) -> None:
-        self.logger.info(message, trace_id, context)
+        extra_data = {"trace_id": trace_id, "context": context}
+        self.logger.info(message, extra=extra_data)
 
     def warning(
         self, message: str, trace_id: str | None = None, context: dict[str, Any] = {}
     ) -> None:
-        self.logger.warning(message, trace_id, context)
+        extra_data = {"trace_id": trace_id, "context": context}
+        self.logger.warning(message, extra=extra_data)
 
     def error(
         self, message: str, trace_id: str | None = None, context: dict[str, Any] = {}
     ) -> None:
-        self.logger.error(message, trace_id, context)
+        extra_data = {"trace_id": trace_id, "context": context}
+        self.logger.error(message, extra=extra_data)
 
     def critical(
         self, message: str, trace_id: str | None = None, context: dict[str, Any] = {}
     ) -> None:
-        self.logger.critical(message, trace_id, context)
+        extra_data = {"trace_id": trace_id, "context": context}
+        self.logger.critical(message, extra=extra_data)
