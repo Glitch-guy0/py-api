@@ -35,4 +35,8 @@ class AuthState(Document):
         if not state_data:
             raise ApplicationError("Unauthorized: Session not found", status_code=401)
 
-        return AuthenticationState(**state_data)
+        return AuthenticationState(
+            session_key=state_data.session_key,
+            state_token=state_data.state_token,
+            redirect_uri=state_data.redirect_uri,
+        )

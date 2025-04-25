@@ -1,3 +1,4 @@
+import datetime
 from auth_service.lib import session_key_generator, state_token_generator
 from auth_service.lib.oidc.interface import Auth_Tokens
 from auth_service.lib.oidc.interface import OIDC_Client
@@ -28,7 +29,7 @@ class Okta_Client(OIDC_Client):
     async def authenticaton_redirect(self) -> RedirectResponse:
         state_token = state_token_generator()
         session_key = session_key_generator()
-        redirect_uri = f"{self.application_redirect_uri}/{session_key}"
+        redirect_uri = self.application_redirect_uri
 
         ServiceLog.debug(
             "Generated auth parameters",
@@ -63,18 +64,27 @@ class Okta_Client(OIDC_Client):
         }
 
         redirect_url = URL(self.authorize_uri)
+        redirect_uri = redirect_url.copy_merge_params(params)
         ServiceLog.debug(
             "Redirect URL generated",
             context={
-                "redirect_url": str(redirect_url.copy_merge_params(params)),
+                "redirect_url": str(redirect_uri),
                 "session_key": session_key,
                 "state_token": state_token,
                 "redirect_uri": redirect_uri,
             },
         )
-        return RedirectResponse(
-            url=str(redirect_url.copy_merge_params(params)), status_code=302
+        response = RedirectResponse(
+            url=str(redirect_uri),
+            status_code=302,
         )
+        response.set_cookie(
+            key="session_key",
+            value=session_key,
+            expires=datetime.datetime.now(tz=datetime.timezone.utc)
+            + datetime.timedelta(minutes=5),
+        )
+        return response
 
     async def authenticaton_callback_handler(
         self, code: str, state: str, session_key: str

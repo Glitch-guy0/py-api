@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Request, Response, Cookie
 from starlette.responses import RedirectResponse
 from auth_service.lib.oidc.client.okta import Okta_Client, Auth_Tokens
 
@@ -15,8 +15,10 @@ async def user_login() -> RedirectResponse:
     return await okta_client.authenticaton_redirect()
 
 
-@router.get("/callback/{session_key}")
-async def user_callback(session_key: str, code: str, state: str, response: Response):
+@router.get("/callback")
+async def user_callback(
+    code: str, state: str, response: Response, session_key: str = Cookie(...)
+):
     tokens: Auth_Tokens = await okta_client.authenticaton_callback_handler(
         code=code, state=state, session_key=session_key
     )
