@@ -94,7 +94,7 @@ class Okta_Client(OIDC_Client):
     async def get_userclaims(self, access_token: str) -> dict:
         async with AsyncClient() as client:
             response = await client.get(
-                self.userinfo_uri, headers={"Authorization": f"Bearer {access_token}"}
+                self.userinfo_uri, headers={"Authorization": access_token}
             )
             try:
                 response.raise_for_status()
