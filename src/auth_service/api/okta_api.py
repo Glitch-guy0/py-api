@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Response, Cookie
 from starlette.responses import RedirectResponse
 from auth_service.lib.oidc.client.okta import Okta_Client, Auth_Tokens
 from shared_lib.exception import ApplicationError
+import datetime
 
 router = APIRouter(
     prefix="/oauth/v2/okta",
@@ -15,8 +16,18 @@ okta_client = Okta_Client()
 class BrowserAuth:
     @staticmethod
     def set_tokens_in_cookie(response: Response, tokens: Auth_Tokens) -> Response:
-        response.set_cookie(key="access_token", value=f"Bearer {tokens.access_token}")
-        response.set_cookie(key="id_token", value=tokens.id_token)
+        response.set_cookie(
+            key="access_token",
+            value=f"Bearer {tokens.access_token}",
+            expires=datetime.datetime.now(tz=datetime.timezone.utc)
+            + datetime.timedelta(minutes=15),
+        )
+        response.set_cookie(
+            key="id_token",
+            value=tokens.id_token,
+            expires=datetime.datetime.now(tz=datetime.timezone.utc)
+            + datetime.timedelta(minutes=15),
+        )
         return response
 
     @staticmethod
@@ -26,7 +37,15 @@ class BrowserAuth:
             id_token = request.cookies.get("id_token")
             return Auth_Tokens(access_token=access_token, id_token=id_token)
         except Exception as e:
-            raise ApplicationError(f"Failed to get tokens from cookie: {e}", 500)
+            raise ApplicationError(
+                f"Unauthorized: Failed to get tokens from cookie: {e}", 401
+            )
+        
+    @staticmethod
+    def delete_tokens_from_cookie(response: Response):
+        response.delete_cookie("access_token")
+        response.delete_cookie("id_token")
+        return response
 
 
 @router.get("/login")
@@ -56,4 +75,6 @@ async def get_userinfo(request: Request):
 
 @router.get("/logout")
 async def user_logout(request: Request):
-    return await okta_client.logout()
+    tokens: Auth_Tokens = BrowserAuth.get_tokens_from_cookie(request)  # temp feature
+    response =  await okta_client.logout(tokens.id_token)
+    return BrowserAuth.delete_tokens_from_cookie(response)  # temp feature

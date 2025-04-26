@@ -88,8 +88,15 @@ class Okta_Client(OIDC_Client):
             tokens = Auth_Tokens(**response.json())
             return tokens
 
-    async def logout(self) -> RedirectResponse:
-        return RedirectResponse(url=self.logout_uri)
+    async def logout(self, id_token: str) -> RedirectResponse:
+        redirect_uri = URL(self.logout_uri)
+        redirect_uri = redirect_uri.copy_merge_params(
+            {
+                "id_token_hint": id_token,
+                "post_logout_redirect_uri": Config.post_logout_redirect_uri,
+            }
+        )
+        return RedirectResponse(url=str(redirect_uri), status_code=302)
 
     async def get_userclaims(self, access_token: str) -> dict:
         async with AsyncClient() as client:

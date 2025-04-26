@@ -33,7 +33,10 @@ class System_Environment(BaseSettings):
     okta_jwks_uri: str = Field(..., validation_alias="OKTA_JWKS_URI")
     okta_scope: str = Field(..., validation_alias="OKTA_SCOPE")
     okta_logout_uri: str = Field(..., validation_alias="OKTA_LOGOUT_URI")
-
+    # oidc common
+    post_logout_redirect_uri: str = Field(
+        ..., validation_alias="POST_LOGOUT_REDIRECT_URI"
+    )
     # mongo config
     mongo_uri: str = Field(..., validation_alias="MONGO_URI")
     mongo_port: int = Field(..., validation_alias="MONGO_PORT")
