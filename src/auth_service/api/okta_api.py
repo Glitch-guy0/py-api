@@ -40,7 +40,7 @@ class BrowserAuth:
             raise ApplicationError(
                 f"Unauthorized: Failed to get tokens from cookie: {e}", 401
             )
-        
+
     @staticmethod
     def delete_tokens_from_cookie(response: Response):
         response.delete_cookie("access_token")
@@ -76,5 +76,5 @@ async def get_userinfo(request: Request):
 @router.get("/logout")
 async def user_logout(request: Request):
     tokens: Auth_Tokens = BrowserAuth.get_tokens_from_cookie(request)  # temp feature
-    response =  await okta_client.logout(tokens.id_token)
+    response = await okta_client.logout(tokens.id_token)
     return BrowserAuth.delete_tokens_from_cookie(response)  # temp feature

@@ -6,7 +6,7 @@ import sys
 
 class System_Environment(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=find_dotenv(raise_error_if_not_found=True)
+        env_file=find_dotenv(raise_error_if_not_found=True), extra="ignore"
     )
 
     service_name: str = Field(..., validation_alias="SERVICE_NAME")
