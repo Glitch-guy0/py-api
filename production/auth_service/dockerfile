@@ -1,0 +1,28 @@
+FROM alpine:latest
+
+# Install Python and required build dependencies
+RUN apk add --no-cache \
+    python3 \
+    py3-pip
+
+RUN adduser -D -h /app app
+USER app
+# Set working directory
+WORKDIR /app
+
+# Copy requirements file
+COPY requirements.txt .
+
+RUN python -m venv .venv
+
+# Install Python dependencies
+RUN .venv/bin/pip3 install --no-cache-dir -r requirements.txt
+
+# # Copy source code
+COPY auth_service /app/auth_service
+COPY shared_lib /app/shared_lib
+COPY start_service.py /app/start_service.py
+VOLUME [ "/app/.env" , "/app/logs"]
+EXPOSE 8000
+
+CMD [".venv/bin/python3", "start_service.py"]
