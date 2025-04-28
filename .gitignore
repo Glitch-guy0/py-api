@@ -5,3 +5,5 @@ __pycache__
 logs/
 .mypy_cache/
 build/
+docker-compose.yml
+dockerfile

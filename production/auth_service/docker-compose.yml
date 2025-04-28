@@ -11,8 +11,9 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./.env:/app/.env
-      - ./logs:/app/logs
+      - ./.env:/app/.env:ro
+      - ./logs:/app/logs:rw
+    user: app
     depends_on:
       - mongodb
       
