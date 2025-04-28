@@ -10,7 +10,7 @@ class System_Environment(BaseSettings):
     )
 
     service_name: str = Field(..., validation_alias="SERVICE_NAME")
-    log_file_path: str = Field(..., validation_alias="LOG_FILE_PATH")
+    log_file_path: str = Field(..., validation_alias="SHARED_LIB_LOG_FILE_PATH")
     log_max_bytes: int = Field(..., validation_alias="LOG_MAX_BYTES")
     log_backup_count: int = Field(..., validation_alias="LOG_BACKUP_COUNT")
 
