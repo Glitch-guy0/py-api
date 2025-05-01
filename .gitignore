@@ -4,6 +4,4 @@ __pycache__
 .pytest_cache
 logs/
 .mypy_cache/
-build/
-docker-compose.yml
-dockerfile
+builds/
