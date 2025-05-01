@@ -1,9 +1,8 @@
 from beanie import init_beanie, Document
 from motor.motor_asyncio import AsyncIOMotorClient
 from shared_lib.exception import ApplicationError
+from shared_lib import lib_logger as logger
 from shared_lib.logger import JSONLogger
-from shared_lib.config import Config
-
 
 class DBInitializer:
     @staticmethod
@@ -15,12 +14,6 @@ class DBInitializer:
         serverSelectionTimeoutMS: int = 3000,
         max_attempts: int = 3,
     ):
-        logger: JSONLogger = JSONLogger(
-            Config.service_name,
-            Config.log_file_path,
-            Config.log_max_bytes,
-            Config.log_backup_count,
-        )
         attempts = 1
 
         def cleanup(logger: JSONLogger):

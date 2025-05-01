@@ -4,7 +4,7 @@ from typing import Annotated
 import datetime
 from shared_lib.exception import ApplicationError
 from auth_service.lib.oidc.interface import AuthenticationState
-
+from auth_service import ServiceLog as logger
 
 class AuthState(Document):
     session_key: Annotated[str, Indexed(unique=True)]
@@ -22,6 +22,14 @@ class AuthState(Document):
         )
         try:
             await cls_object.save()
+            logger.debug(
+                "Authentication state saved successfully",
+                context={
+                    "action": "save_auth_state",
+                    "session_key_length": len(auth_state.session_key),
+                    "state_token_length": len(auth_state.state_token)
+                }
+            )
         except Exception as e:
             if isinstance(e, DocumentAlreadyCreated):
                 raise ApplicationError(
@@ -35,6 +43,14 @@ class AuthState(Document):
         if not state_data:
             raise ApplicationError("Unauthorized: Session not found", status_code=401)
 
+        logger.debug(
+            "Authentication state retrieved successfully",
+            context={
+                "action": "get_auth_state",
+                "session_key_length": len(session_key),
+                "state_token_length": len(state_data.state_token)
+            }
+        )
         return AuthenticationState(
             session_key=state_data.session_key,
             state_token=state_data.state_token,
