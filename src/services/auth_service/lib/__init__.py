@@ -1,5 +1,5 @@
 import secrets
-from auth_service import ServiceLog as logger
+from config import ServiceLog as logger
 
 
 def state_token_generator() -> str:

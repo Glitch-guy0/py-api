@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from auth_service.lib.oidc.interface import AuthenticationState
-from auth_service.models.auth_state import AuthState
-from auth_service import ServiceLog as logger
+from lib.oidc.interface import AuthenticationState
+from models.auth_state import AuthState
+from config import ServiceLog as logger
 import time
 
 @dataclass

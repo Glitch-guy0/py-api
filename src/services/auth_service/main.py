@@ -1,11 +1,11 @@
 import sys
 from fastapi import FastAPI
 
-from auth_service.config import Config
+from config import Config
 from shared_lib.database import DBInitializer
-from auth_service.models import models
-from auth_service.api.okta_api import router as auth_router
-from auth_service import ServiceLog as logger
+from models import models
+from api.okta_api import router as auth_router
+from config import ServiceLog as logger
 
 async def initialize_server(app: FastAPI):
     logger.info("Initializing server", context={"action": "initialize_server"})

@@ -1,14 +1,14 @@
 import datetime
-from auth_service.lib import session_key_generator, state_token_generator
-from auth_service.lib.oidc.interface import Auth_Tokens
-from auth_service.lib.oidc.interface import OIDC_Client
+from lib import session_key_generator, state_token_generator
+from lib.oidc.interface import Auth_Tokens
+from lib.oidc.interface import OIDC_Client
 from fastapi.responses import RedirectResponse
 from httpx import URL, AsyncClient, HTTPStatusError
-from auth_service.config import Config
+from config import Config
 from shared_lib.exception import ApplicationError
-from auth_service.repository.auth_state import AuthStateRepository, AuthenticationState
-from auth_service.lib.oidc.interface import Auth_Tokens
-from auth_service import ServiceLog as logger
+from repository.auth_state import AuthStateRepository, AuthenticationState
+from lib.oidc.interface import Auth_Tokens
+from config import ServiceLog as logger
 
 class Okta_Client(OIDC_Client):
     def __init__(self):

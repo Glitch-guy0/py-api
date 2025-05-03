@@ -3,8 +3,8 @@ from beanie.exceptions import DocumentAlreadyCreated
 from typing import Annotated
 import datetime
 from shared_lib.exception import ApplicationError
-from auth_service.lib.oidc.interface import AuthenticationState
-from auth_service import ServiceLog as logger
+from lib.oidc.interface import AuthenticationState
+from config import ServiceLog as logger
 
 class AuthState(Document):
     session_key: Annotated[str, Indexed(unique=True)]
