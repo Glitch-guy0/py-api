@@ -7,20 +7,13 @@ RUN apk add --no-cache \
 
 # create non-root user
 RUN adduser -D -h /app app
-USER app
 
 # set working directory
 WORKDIR /app
-
-# Copy source code
-COPY requirements.txt .
-COPY auth_service /app/auth_service
-COPY shared_lib /app/shared_lib
-COPY start_service.py /app/start_service.py
 EXPOSE 8000
 
-# create virtual environment
-RUN python -m venv .venv
-RUN .venv/bin/pip3 install --no-cache-dir -r requirements.txt
-
-CMD [ ".venv/bin/python3", "start_service.py" ]
+# Copy source code
+COPY . .
+RUN chmod +x ./entrypoint.sh
+USER app
+ENTRYPOINT ["./entrypoint.sh"]

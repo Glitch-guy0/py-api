@@ -7,15 +7,14 @@ RUN apk add --no-cache \
 
 # create non-root user
 RUN adduser -D -h /app app
-USER app
 
 # set working directory
 WORKDIR /app
+EXPOSE 8000
 
 # Copy source code
 COPY . .
+RUN chmod +x ./entrypoint.sh
 
-
-EXPOSE 8000
-
-CMD [ ".venv/bin/python3", "start_service.py" ]
+USER app
+ENTRYPOINT ["./entrypoint.sh"]
