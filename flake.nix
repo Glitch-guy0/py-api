@@ -14,13 +14,15 @@
     in
     {
       devShells.default = pkgs.mkShell {
+        # Environment variables
+        EDITOR = "vim";
+
         packages = with pkgs; [
           python3Full
           vim
         ];
 
         shellHook = ''
-          export EDITOR=vim
           if [ ! -d .venv ]; then
             python3 -m venv .venv
             pip install -r requirements.txt --no-cache-dir
