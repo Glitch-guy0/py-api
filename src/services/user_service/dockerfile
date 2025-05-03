@@ -13,14 +13,9 @@ USER app
 WORKDIR /app
 
 # Copy source code
-COPY requirements.txt .
-COPY user_service /app/user_service
-COPY shared_lib /app/shared_lib
-COPY start_service.py /app/start_service.py
-EXPOSE 8000
+COPY . .
 
-# create virtual environment
-RUN python -m venv .venv
-RUN .venv/bin/pip3 install --no-cache-dir -r requirements.txt
+
+EXPOSE 8000
 
 CMD [ ".venv/bin/python3", "start_service.py" ]
