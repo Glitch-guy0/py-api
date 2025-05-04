@@ -1,86 +1,84 @@
-# Auth Service
 
-This microservice handles user authentication using FastAPI and Okta OIDC integration. It follows a modular architecture for scalability and maintainability.
 
-## Project Structure
+# Project Structure
 
-#### api/
-- Contains all API endpoint routes
-- Handles HTTP requests and responses
-- Defines route handlers and middleware
-- Key files:
-  - `auth.py`: OAuth2/OIDC authentication routes
-    - `user_login()`: OAuth2 login endpoint
-    - `user_callback()`: OAuth2 callback endpoint
-
-#### lib/
-- Contains core business logic and utility classes
-- Implements authentication flows and token handling
-- Key files:
-  - `oidc_client.py`: OIDC authentication implementation
-    - OAuth2/OIDC flow management
-    - Token and user data handling
-
-#### models/
-- Contains database schema definitions
-- Defines data structures and relationships
-- Key files:
-  - `state_token.py`: State token schema
-
-#### repositories/
-- Database access layer abstraction
-- Implements CRUD operations
-- Key files:
-  - `state_token.py`: State token database operations
-    - Token storage and retrieval
-    - Token validation
-
-#### tests/
-- Test suite implementation
-- Unit and integration tests
-- Test utilities and fixtures
-
-#### config/
-- Environment configuration management
-- Configuration loading and validation
-- Environment variable handling
-
-### Root Files
-
-#### main.py
-- Application bootstrap
-- FastAPI app initialization
-- Route registration
-- Middleware setup
-
+src/
+│
+├── api/                    # HTTP API endpoints and routing
+│   └── auth.py             # OAuth2/OIDC login and callback endpoints
+│
+├── lib/                    # Core authentication logic and helpers
+│   └── oidc_client.py      # OIDC client for token and user flow handling
+│
+├── models/                 # Pydantic or DB schema definitions
+│   └── state_token.py      # Schema for state tokens
+│
+├── repositories/           # Data access and storage logic
+│   └── state_token.py      # State token persistence and validation
+│
+├── config/                 # Configuration management
+│   └── env_config.py       # Environment variable loading and validation
+│
+├── tests/                  # Unit and integration tests
+│   ├── conftest.py         # Test fixtures
+│   └── test_auth.py        # Auth flow tests
+│
+└── main.py                 # FastAPI app entrypoint and bootstrap
 
 # Environment Variables
+## Service Info
+| Variable | Description |
+|----------|-------------|
+| **SERVICE_NAME** | Name of the microservice |
 
-The service requires the following environment variables to be set:
+## Logging
+| Variable | Description | Example |
+|----------|-------------|----------|
+| **LOG_FILE_PATH** | File path for service logs | logs/auth_service.log |
+| **LOG_MAX_BYTES** | Max log file size (bytes) | 5242880 (5MB) |
+| **LOG_BACKUP_COUNT** | Number of log backups | 3 |
+| **SHARED_LIB_LOG_FILE_PATH** | Path to shared library log file | "logs/shared_lib.log" |
 
-### Service Config
-- SERVICE_NAME: Name of the service (default: "auth_service")
 
-### Logging Config
-- LOG_FILE_PATH: Path to log file (default: "logs/auth_service.log") 
-- LOG_MAX_BYTES: Maximum log file size in bytes (default: 5MB)
-- LOG_BACKUP_COUNT: Number of backup log files to keep (default: 3)
+## Okta OIDC Configuration
+| Variable | Description |
+|----------|-------------|
+| **OKTA_AUTHORIZE_URI** | Authorization endpoint |
+| **OKTA_APPLICATION_REDIRECT_URI** | OAuth redirect URI |
+| **OKTA_CLIENT_ID** | OAuth client ID |
+| **OKTA_CLIENT_SECRET** | OAuth client secret |
+| **OKTA_TOKEN_URI** | Token endpoint URI |
+| **OKTA_USERINFO_URI** | User info endpoint URI |
+| **OKTA_JWKS_URI** | JWKS (JSON Web Key Set) URI |
+| **OKTA_SCOPE** | OAuth scopes (e.g., openid profile email) |
+| **OKTA_LOGOUT_URI** | Okta logout endpoint URI |
 
-### Okta Config
-- OKTA_AUTHORIZE_URI: Okta authorization endpoint URL
-- OKTA_APPLICATION_REDIRECT_URI: Redirect URI for OAuth flow
-- OKTA_CLIENT_ID: OAuth client ID
-- OKTA_CLIENT_SECRET: OAuth client secret
-- OKTA_TOKEN_URI: Token endpoint URL
-- OKTA_USERINFO_URI: User info endpoint URL
-- OKTA_JWKS_URI: JSON Web Key Set endpoint URL
-- OKTA_SCOPE: OAuth scopes to request
-- OKTA_LOGOUT_URI: Logout endpoint URL
+## OIDC Flow Config
+| Variable | Description |
+|----------|-------------|
+| **POST_LOGOUT_REDIRECT_URI** | Redirect after logout |
 
-### OIDC Config
-- POST_LOGOUT_REDIRECT_URI: URI to redirect to after logout
+## MongoDB Configuration
+| Variable | Description |
+|----------|-------------|
+| **MONGO_URI** | MongoDB URI |
+| **MONGO_PORT** | MongoDB port |
+| **MONGO_DB_NAME** | Database name |
 
-### MongoDB Config
-- MONGO_URI: MongoDB connection URI
-- MONGO_PORT: MongoDB port number
-- MONGO_DB_NAME: MongoDB database name
+## Docker Setup
+
+### Dependencies
+- **mongo:latest** - MongoDB database container image
+
+### Ports
+| Host Port | Container Port | Description |
+|-----------|---------------|-------------|
+| 8000 | 8000 | FastAPI application |
+
+### Volumes
+| Host Path | Container Path | Description |
+|-----------|---------------|-------------|
+| ./.env | /app/.env | Environment configuration |
+| ./logs | /app/logs | Log directory |
+| ./src/services/shared_lib | /app/shared_lib | Shared libraries |
+| ./requirements.txt | /app/requirements.txt | Python dependencies |
