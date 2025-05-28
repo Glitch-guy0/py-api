@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from config import Config
 from shared_lib.database import DBInitializer
 from models import models
-from api.okta_api import router as auth_router
+from services.auth_service.module.okta import router as auth_router
 from config import ServiceLog as logger
 
 async def initialize_server(app: FastAPI):

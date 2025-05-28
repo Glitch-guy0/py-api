@@ -28,6 +28,9 @@
             pip install -r requirements.txt --no-cache-dir
           fi
           source .venv/bin/activate
+
+          # alias
+          alias compose="docker compose"
           echo "Running fastapi dev environment"
         '';
       };

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Response, Cookie
 from starlette.responses import RedirectResponse
-from lib.oidc.client.okta import Okta_Client, Auth_Tokens
+from services.auth_service.module.okta.lib.okta import Okta_Client, Auth_Tokens
 from shared_lib.exception import ApplicationError
 import datetime
 from config import ServiceLog as logger
